@@ -1,0 +1,95 @@
+name: 🌋M@TE🌋 Model Request
+description: Request a model to be included in the hub
+title: "M@TE Model Request: <name>"
+labels: [new-model]
+
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for taking the time to open a Model Request!"
+
+  - type: input
+    id: model-name
+    attributes:
+      label: Model Name
+      description: "Suggest a name for your model"
+      placeholder: "Expanding Earth"
+    validations:
+      required: true
+
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+      description: "Please provide a short description of your model"
+      placeholder: "It really is...expanding"
+    validations:
+      required: true
+
+  - type: input
+    id: for
+    attributes:
+      label: Field of research
+      description: "Please submit a Field of Research (FOR) code. Please use [this resource]( https://vocabs.ardc.edu.au/viewById/316) to search codes."
+      placeholder: "3706"
+    validations:
+      required: true
+
+      
+  - type: checkboxes
+    id: mod_type
+    attributes:
+      label: model type
+      description: What type of model are you submitting?
+      options:
+        - label: published study
+        - label: commmunity benchmark
+        - label: reproduction of a previous model
+        - label: missing data model 
+        - label: other
+    validations:
+      required: true
+
+  - type: input
+    id: model-publication
+    attributes:
+      label: Publication
+      description: "Is there a link to a publication?"
+
+  - type: input
+    id: source-code
+    attributes:
+      label: Source Code
+      description: "Is code for the model available? If so, please provide link to repository (GitHub, GitLab, BitBucket...)?"
+
+  - type: input
+    id: model-license
+    attributes:
+      label: License
+      description: "If there is a license, please provide the name of the license (or None if there is no license specified)."
+      placeholder: "CC-BY-4.0"
+    validations:
+      required: true
+
+
+  - type: textarea
+    id: computation_file_description
+    attributes:
+      label: File Description
+      description: "Please describe any additional files (related to model execution, reproduction and postprocessing) in the table below"
+      value:
+        Filename/pattern | Description | Notes
+
+        --- | --- | ---
+
+        E.g., `model_files/input.py` (add rows as needed) | E.g., description of `model_files/input.py` |
+
+        E.g., `model_files/Dockerfile` (add rows as needed) | E.g., description of `model_files/Dockerfile`  | E.g., link to existing image on Dockerhub
+
+        E.g., `log.txt` | E.g., Logfile from original model execution on NCI Gadi  | 
+
+
+
+
+
+      
