@@ -331,29 +331,25 @@ def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list,
 
     return metadata_out
 
-def dict_to_yaml(issue_dict, timestamp = False):
-    '''
-
-    Returns:
-    - str: a string representing the markdown with YAML frontmatter
-
-    '''
-    yaml_dict = {}
-    #map the issue dict through to the yaml_dict
-    map_dictionaries(yaml_dict, issue_dict, issue_yaml_mapping)
-    #this function makes some further changes,
-    #basically applies fixed so yaml_dict is configured correctly
-    configure_yaml_output_dict(yaml_dict, issue_dict, timestamp =timestamp)
-
-    #convert the dictionary YAML string using ruamel.yaml
-
-    #yaml_string = Ryaml.dump_to_string(yaml_dict)
-    #formatted_yaml_string = save_yaml_with_header(yaml_string)
-
-    #the string returned should be in approapriate format
-    #to write directly to the ./website/graphics
-    return yaml_dict
-    #return formatted_yaml_string
+#def dict_to_yaml(issue_dict, timestamp = False):
+#    '''
+#    Returns:
+#    - str: a string representing the markdown with YAML frontmatter
+#
+#    '''
+#    yaml_dict = {}
+#    #map the issue dict through to the yaml_dict
+#    map_dictionaries(yaml_dict, issue_dict, issue_yaml_mapping)
+#    #this function makes some further changes,
+#    #basically applies fixed so yaml_dict is configured correctly
+#    configure_yaml_output_dict(yaml_dict, issue_dict, timestamp =timestamp)
+#    #convert the dictionary YAML string using ruamel.yaml
+#    #yaml_string = Ryaml.dump_to_string(yaml_dict)
+#    #formatted_yaml_string = save_yaml_with_header(yaml_string)
+#    #the string returned should be in approapriate format
+#    #to write directly to the ./website/graphics
+#    return yaml_dict
+#    #return formatted_yaml_string
 
 
 
