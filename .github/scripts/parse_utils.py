@@ -129,73 +129,39 @@ def get_authors(author_list):
 
 
 def get_funders(funder_list):
-
     log = ""
     funders = []
 
     for funder in funder_list:
+        # Step 1: Try to resolve name or URL
         if "ror.org" not in funder:
             ror_id, get_log = search_organization(funder)
             log += get_log
-
             if not ror_id:
                 funders.append({"@type": "Organization", "name": funder, "url": funder})
-            else:
-                funder = ror_id
+                continue
+            funder = ror_id
 
+        # Step 2: Handle ROR.org IDs properly
         if "ror.org" in funder:
-            record, get_log = get_record("organization", funder)
+            ror_id = funder.rstrip("/").split("/")[-1]
+            ror_url = f"https://ror.org/{ror_id}"
+
+            record, get_log = get_record("organization", ror_id)
             funder_record, parse_log = parse_organization(record)
-            if get_log or parse_log:
-                log += get_log + parse_log
-            #change by Dan
-            #else:
+            log += get_log + parse_log
+
+            if not funder_record:
+                funder_record = {"@type": "Organization", "@id": ror_url, "name": ""}
+            else:
+                funder_record["@id"] = ror_url
+
             funders.append(funder_record)
 
     return funders, log
 
 
-# def parse_image_and_caption(img_string, default_filename):
-#     log = ""
-#     image_record = {}
-#
-#     md_regex = r"\[(?P<filename>.*?)\]\((?P<url>.*?)\)"
-#     html_regex = r'alt="(?P<filename>[^"]+)" src="(?P<url>[^"]+)"'
-#     pattern = re.compile(r"https://github.com/ModelAtlasofTheEarth/[^/]+/assets/")
-#
-#     # Hack to recognise SVG files
-#     filetype.add_type(Svg())
-#
-#     caption = []
-#
-#     for string in img_string.split("\r\n"):
-#         #if "https://github.com/ModelAtlasofTheEarth/model_submission/assets/" in string:
-#         if pattern.search(string):
-#             try:
-#                 image_record = re.search(md_regex, string).groupdict()
-#             except:
-#                 if string.startswith("https://"):
-#                     image_record = {"filename": default_filename, "url": string}
-#                 elif "src" in string:
-#                     image_record = re.search(html_regex, string).groupdict()
-#                 else:
-#                     log += "Error: Could not parse image file and caption\n"
-#         else:
-#             caption.append(string)
-#
-#     # Get correct file extension for images
-#     if "url" in image_record:
-#         response = requests.get(image_record["url"])
-#         content_type = response.headers.get("Content-Type")[:5]
-#         if content_type in ["video", "image"]:
-#             image_record["filename"] += "." + filetype.get_type(mime=response.headers.get("Content-Type")).extension
-#
-#     image_record["caption"] = "\n".join(caption)
-#
-#     if not caption:
-#         log += "Error: No caption found for image.\n"
-#
-#     return image_record, log
+
 
 
 #Modification to deal with pdf better
@@ -528,61 +494,38 @@ def parse_size(size_str, base_unit=1024):
     return value, error_log
 
 def process_funding_data(input_string):
-
     """
     Processes an input string containing research funding data to extract information about funders and their grants.
-
-    The input string should consist of lines, each representing funding data in the format "funder, grantnumber",
-    where "grantnumber" is optional. The function identifies whether the funder is a simple name, a URL, or a ROR
-    address and processes it accordingly to construct schema.org Organization and Grant records.
-
-    If the funder information is a URL, it attempts to find the corresponding organization using ROR.org. For ROR
-    addresses, it retrieves the JSON-LD record for the organization. Simple names are directly converted into
-    Organization records. Grant numbers, if provided, are associated with their funders in the resulting data.
-
-    Funders mentioned in the grant information are also included in the overall funders list, ensuring there are
-    no duplicates in the final output.
-
-    Parameters:
-    - input_string (str): A multiline string where each line contains funder information followed by an optional
-                          grant number, separated by a comma.
-
-    Returns:
-    - dict: A dictionary with two keys: 'funders' and 'funding'. 'funders' is a list of unique funders represented
-            as schema.org Organization objects. 'funding' is a list of grants, each associated with a funder.
-
-    Note:
-    - If the input is an empty string or invalid, the function returns empty lists for both 'funders' and 'funding'.
-    - This function relies on external helper functions `get_funders` for ROR addresses and `search_organization`
-      for URLs to find organizations. Proper implementations of these functions are required.
     """
-
     schema_funders = []
     schema_funding = []
 
     for line in input_string.split('\n'):
         if not line.strip():
             continue
-        parts = line.split(',', 1)  # Split by the first comma only
+        parts = line.split(',', 1)
         funder_info = parts[0].strip()
         grant_number = parts[1].strip() if len(parts) > 1 else None
-        #print(funder_info, grant_number)
-        # Check if the funder info is a simple name, URL, or ROR address
-        if re.match(r'^https?:\/\/ror\.org\/', funder_info):  # ROR address
+
+        # Determine funder type
+        if re.match(r'^https?:\/\/ror\.org\/', funder_info):
+            # ✅ Ensure ROR ID is clean before lookup
+            ror_id = funder_info.rstrip('/').split('/')[-1]
+            funder_info = f"https://ror.org/{ror_id}"
             results, log = get_funders([funder_info])
             organization = results[0] if isinstance(results, list) and results else {'@type': 'Organization', 'name': ''}
-        elif re.match(r'^https?:\/\/', funder_info):  # URL
+        elif re.match(r'^https?:\/\/', funder_info):
             try:
-                ror= search_organization(funder_info)
-                result, log = get_funders(funder_info)
+                ror = search_organization(funder_info)
+                results, log = get_funders([funder_info])
                 organization = results[0] if isinstance(results, list) and results else {'@type': 'Organization', 'name': ''}
-            except:
-                #make a minimal record, using the url as @id
-                organization = {'@type': 'Organization', '@id': funder_info,  'name': ''}
+            except Exception:
+                organization = {'@type': 'Organization', '@id': funder_info, 'name': ''}
                 log = "Can't find funding Organisation"
-        else:  # Simple name
+        else:
             organization = {'@type': 'Organization', 'name': funder_info}
-        # Handle grant number and organization association
+
+        # Associate grants
         if grant_number:
             schema_funding.append({
                 '@type': 'Grant',
@@ -592,15 +535,12 @@ def process_funding_data(input_string):
         else:
             schema_funders.append(organization)
 
-        # Add organizations from funding to funders, avoiding duplicates
+        # Merge unique funders
         for funding_entry in schema_funding:
             if funding_entry['funder'] not in schema_funders:
                 schema_funders.append(funding_entry['funder'])
 
-
     return {'funders': schema_funders, 'funding': schema_funding}
-
-
 
 def identify_separator(input_string):
     # Strip leading and trailing whitespace and split by newline to get lines

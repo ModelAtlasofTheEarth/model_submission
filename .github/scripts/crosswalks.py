@@ -2,17 +2,9 @@ import json
 from ro_crate_utils import *
 from crosswalk_mappings import *
 from nci_iso_tools import *
-from yaml_utils import *
-import ruamel.yaml
 import copy
-from pyld import jsonld
 import pandas as pd
 from config import MATE_GADI
-
-Ryaml = ruamel.yaml.YAML(typ=['rt', 'string'])
-Ryaml.preserve_quotes = True
-#control the indentation...
-Ryaml.indent(mapping=2, sequence=4, offset=2)
 
 
 
@@ -49,17 +41,6 @@ def dict_to_report(issue_dict, verbose = False):
             report += f"([{creator['@id'].split('/')[-1]}]({creator['@id']}))"
         report += "  \n"
     report += "  \n"
-
-    # model contributors(s)
-    #report += "**Model Contributor(s):**  \n\n"
-    #for contributor in issue_dict["contributors"]:
-    #    report += f"- {contributor['givenName']} {contributor['familyName']} "
-    #    if "@id" in contributor:
-    #        report += f"([{contributor['@id'].split('/')[-1]}]({contributor['@id']}))"
-    #    report += "  \n"
-    #report += "  \n"
-
-
 
     # slug, this gets mapped to name. This is what the model is called on NCI
     report += "**Model slug:**  \n\n"
@@ -114,12 +95,13 @@ def dict_to_report(issue_dict, verbose = False):
     # funder
     report += "**Funder(s):**  \n"
     for funder in issue_dict["funder"]:
-        report += f"- {funder['name']} "
-        if "@id" in funder:
-            report += f"({funder['@id']})"
-        elif "url" in funder:
-            report += f"({funder['url']})"
-        report += "  \n"
+        if 'name' in funder.keys():
+            report += f"- {funder['name']} "
+            if "@id" in funder:
+                report += f"({funder['@id']})"
+            elif "url" in funder:
+                report += f"({funder['url']})"
+            report += "  \n"
     report += "  \n"
 
 
@@ -258,14 +240,7 @@ def dict_to_report(issue_dict, verbose = False):
                 report += f"Description:  {issue_dict['model_setup_description']}\n\n"
         report += '  \n'
 
-    # description
-    #if "model_setup_description" in issue_dict:
-    #    report += "**Model setup description:**  \n"
-    #    report += f"{issue_dict['model_setup_description']}\n\n"
 
-    #if verbose is True:
-    #    report += "  \n ** Dumping dictionary during testing **  \n"
-    #    report += str(issue_dict)
 
     return report
 
@@ -330,30 +305,6 @@ def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list,
     metadata_out = json.dumps(ro_crate)
 
     return metadata_out
-
-def dict_to_yaml(issue_dict, timestamp = False):
-    '''
-
-    Returns:
-    - str: a string representing the markdown with YAML frontmatter
-
-    '''
-    yaml_dict = {}
-    #map the issue dict through to the yaml_dict
-    map_dictionaries(yaml_dict, issue_dict, issue_yaml_mapping)
-    #this function makes some further changes,
-    #basically applies fixed so yaml_dict is configured correctly
-    configure_yaml_output_dict(yaml_dict, issue_dict, timestamp =timestamp)
-
-    #convert the dictionary YAML string using ruamel.yaml
-
-    #yaml_string = Ryaml.dump_to_string(yaml_dict)
-    #formatted_yaml_string = save_yaml_with_header(yaml_string)
-
-    #the string returned should be in approapriate format
-    #to write directly to the ./website/graphics
-    return yaml_dict
-    #return formatted_yaml_string
 
 
 
