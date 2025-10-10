@@ -312,7 +312,7 @@ url_cache = {}
 
 def parse_image_and_caption(img_string, default_filename):
     log = ""
-    image_record = {"filename": "", "url": "", "caption": ""}
+    image_record = {"filename": None, "url": "", "caption": ""}
 
     # Precompile regex patterns for Markdown image links
     md_regex = re.compile(r"\[(?P<filename>[^]]+)\]\((?P<url>https?://[^\s)]+)\)")
@@ -326,7 +326,7 @@ def parse_image_and_caption(img_string, default_filename):
     caption = []
 
     # Split lines and check for patterns
-    for line in img_string.split("\r\n"):
+    for line in img_string.splitlines():
         # Check if the line matches the Markdown pattern for image links
         md_match = md_regex.search(line)  
         if md_match:
@@ -370,6 +370,9 @@ def parse_image_and_caption(img_string, default_filename):
         else:
             log += f"Warning: File is not an image (Content-Type: {content_type}).\n"
 
+    # Images and animations go in 'graphics/' directory
+    if image_record["filename"] is not None and not image_record["filename"].startswith("graphics/"):
+        image_record["filename"] = "graphics/" + image_record["filename"]
     return image_record, log
 
 def extract_doi_parts(doi_string):
