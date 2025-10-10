@@ -31,28 +31,45 @@ def parse_author(metadata):
 
     return author_record, log
 
-def parse_organization(metadata):
+def parse_organization(record):
+    """
+    Parses a ROR organization record into a schema.org Organization dict.
+    Handles both legacy and current ROR formats.
+    """
     log = ""
-    org_record = {}
 
-    if "@type" and "@id" in metadata.keys():
-        org_record = metadata
-        log += "ROR metadata record succesfully extracted in json-ld format \n"
+    if not record or "id" not in record:
+        return {}, "Error: invalid or empty organization record.\n"
 
-    else:
+    try:
+        org = {"@type": "Organization"}
+        org["@id"] = record.get("id")
 
-        try:
-           org_record = {
-               "@type": "Organization",
-               "@id": metadata["id"],
-               "name": metadata["name"],
-           }
+        # ✅ Handle modern ROR format (name inside 'names' list)
+        if "name" in record and isinstance(record["name"], str):
+            org["name"] = record["name"]
+        elif "names" in record and isinstance(record["names"], list) and record["names"]:
+            org["name"] = record["names"][0].get("value", "")
+        else:
+            org["name"] = "(unknown name)"
+            log += "Warning: missing name field.\n"
 
-        except Exception as err:
-            log += "Error: unable to parse organization metadata. \n"
-            log += f"`{err}`\n"
+        # Add homepage if available
+        links = record.get("links", [])
+        if links:
+            if isinstance(links[0], dict):
+                org["url"] = links[0].get("value")
+            else:
+                org["url"] = links[0]
 
-        return org_record, log
+        # Add organization types if available
+        if record.get("types"):
+            org["additionalType"] = record["types"]
+
+        return org, log
+
+    except Exception as e:
+        return {}, f"Error: unable to parse organization metadata.\n`{e}`\n"
 
 
 def parse_software(metadata, doi):
