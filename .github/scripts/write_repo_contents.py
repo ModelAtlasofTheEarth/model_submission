@@ -198,9 +198,7 @@ model_repo.replace_topics(keywords)
 # Copy web material to repo
 commit_message = 'Add issue dict. in json to website'
 model_repo.create_file(".website_material/index.json", commit_message, issue_dict_str)
-copy_files(model_repo, ".website_material/graphics/", data)
-
-
+copy_files(model_repo, ".website_material/", data)
 
 # Report creation of repository
 issue.create_comment(f"Model repository created at https://github.com/{model_owner}/{model_repo_name}")

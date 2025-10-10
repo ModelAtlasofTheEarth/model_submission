@@ -596,7 +596,7 @@ def parse_issue(issue):
     #############
     # landing page image and caption
     img_string = data["-> add landing page image and caption"].strip()
-    empty_image_record = {"filename":"", "url": ""}
+    empty_image_record = {"filename": None, "url": ""}
 
     #if img_string == "_No response_":
     if null_response_check(img_string):
@@ -657,5 +657,7 @@ def parse_issue(issue):
     else:
         data_dict["model_setup_description"] = model_description
 
+    # Add dateSubmitted
+    data["dateSubmitted"] = datetime.now().isoformat()
 
     return data_dict, error_log
