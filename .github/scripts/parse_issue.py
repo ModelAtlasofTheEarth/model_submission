@@ -660,4 +660,7 @@ def parse_issue(issue):
     # Add dateSubmitted
     data["dateSubmitted"] = datetime.now().isoformat()
 
+    # Add templateKey
+    data["templateKey"] = "model-json"
+
     return data_dict, error_log
