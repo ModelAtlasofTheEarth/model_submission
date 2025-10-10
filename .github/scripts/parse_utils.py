@@ -342,6 +342,8 @@ def parse_image_and_caption(img_string, default_filename):
         and image_record["filename"] != ""
         and not image_record["filename"].startswith("graphics/")):
         image_record["filename"] = "graphics/" + image_record["filename"]
+    if image_record["filename"] == "":
+        image_record["filename"] = None
     return image_record, log
 
 def extract_doi_parts(doi_string):
