@@ -94,8 +94,6 @@ issue_dict_str = json.dumps(data)
 model_repo.create_file(".metadata_trail/issue_body.md","add issue_body", issue.body)
 model_repo.create_file(".metadata_trail/issue_dict.json","add issue_dict", issue_dict_str)
 
-
-
 #####Save license
 
 try:
@@ -196,15 +194,10 @@ print(keywords)
 model_repo.replace_topics(keywords)
 
 
-#######
-## fomat and write the web YAML
-#web_yaml_dict = dict_to_yaml(data, timestamp= timestamp)
-#yaml_content_with_frontmatter = format_yaml_string(web_yaml_dict)
-#commit_message = 'Add YAML file with front matter'
-#model_repo.create_file(".website_material/index.md", commit_message, yaml_content_with_frontmatter)
-
 
 # Copy web material to repo
+commit_message = 'Add issue dict. in json to website'
+model_repo.create_file(".website_material/index.json", commit_message, issue_dict_str)
 copy_files(model_repo, ".website_material/graphics/", data)
 
 
