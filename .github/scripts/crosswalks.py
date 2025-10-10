@@ -114,12 +114,13 @@ def dict_to_report(issue_dict, verbose = False):
     # funder
     report += "**Funder(s):**  \n"
     for funder in issue_dict["funder"]:
-        report += f"- {funder['name']} "
-        if "@id" in funder:
-            report += f"({funder['@id']})"
-        elif "url" in funder:
-            report += f"({funder['url']})"
-        report += "  \n"
+        if 'name' in funder.keys():
+            report += f"- {funder['name']} "
+            if "@id" in funder:
+                report += f"({funder['@id']})"
+            elif "url" in funder:
+                report += f"({funder['url']})"
+            report += "  \n"
     report += "  \n"
 
 
