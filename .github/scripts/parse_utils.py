@@ -337,8 +337,13 @@ def parse_image_and_caption(img_string, default_filename):
             log += f"Warning: File is not an image (Content-Type: {content_type}).\n"
 
     # Images and animations go in 'graphics/' directory
-    if image_record["filename"] is not None and not image_record["filename"].startswith("graphics/"):
+    if (
+        image_record["filename"] is not None
+        and image_record["filename"] != ""
+        and not image_record["filename"].startswith("graphics/")):
         image_record["filename"] = "graphics/" + image_record["filename"]
+    if image_record["filename"] == "":
+        image_record["filename"] = None
     return image_record, log
 
 def extract_doi_parts(doi_string):
