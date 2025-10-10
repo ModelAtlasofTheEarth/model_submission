@@ -204,7 +204,7 @@ model_repo.create_file(".website_material/index.md", commit_message, yaml_conten
 
 
 # Copy web material to repo
-copy_files(model_repo, ".website_material/graphics/", data)
+copy_files(model_repo, ".website_material/", data)
 
 
 
