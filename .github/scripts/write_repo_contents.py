@@ -2,12 +2,13 @@ import os
 import re
 from github import Github, Auth
 from parse_issue import parse_issue
-from crosswalks import dict_to_metadata, dict_to_yaml, dict_to_report, metadata_to_nci
+#from crosswalks import dict_to_metadata, dict_to_yaml, dict_to_report, metadata_to_nci
+from crosswalks import dict_to_metadata, dict_to_report, metadata_to_nci
 from ro_crate_utils import replace_keys_recursive, assign_ids
-from yaml_utils import format_yaml_string
+#from yaml_utils import format_yaml_string
 from request_utils import download_license_text
 from copy_files import copy_files
-from ruamel.yaml import YAML
+#from ruamel.yaml import YAML
 import io
 from io import StringIO
 import json
