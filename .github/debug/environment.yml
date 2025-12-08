@@ -1,0 +1,40 @@
+name: mate-github
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Core language
+  - python=3.11
+
+  # Data handling
+  - pandas
+
+  # Networking / HTTP
+  - requests
+  - urllib3
+
+  # Interactive development
+  - ipython
+  - ipykernel
+  - jupyterlab
+
+  # GitHub API access
+  - pygithub
+
+  # Utilities for file & string handling
+  - filetype
+  - fuzzywuzzy
+  - python-levenshtein  # speeds up fuzzywuzzy
+
+  # Markdown display in notebooks
+  - markdown
+
+  # Optional, handy for secrets and env vars
+  - python-dotenv
+
+  # Always include pip for extra installs
+  - pip
+  - pip:
+      # add pip-only packages here if you later need them
+      - tqdm
