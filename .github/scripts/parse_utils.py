@@ -87,7 +87,10 @@ def parse_name_or_orcid(name_or_orcid):
 
 
 def parse_yes_no_choice(input):
-    if "X" in input:
+    '''
+    input is assumed to be a string
+    '''
+    if "x" in input.lower():
         return True
     else:
         return False
