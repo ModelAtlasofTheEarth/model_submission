@@ -65,5 +65,29 @@ On failure: if the test web build fails - notify on the model repo, not necessar
 # Questions
 
 - file uploads - how do we deal with scale when there's more than a handful of files?
+
+  Large files are moved directly to the NCI provided VM.
+  
 - create an assets directory in the model repo and provide instructions for the researcher to clone the repo, add their files and do a PR?
 
+-------
+
+## JG + DS workflow for M@TE - Dec 26
+
+Phase 1:
+
+GitHub Issue created. Approved and original author can fix metadata / records only.
+
+Phase 2:
+
+Approved ‘model approved’ and then a new github repo is created for that entry with the stub name.
+
+Phase 3:
+
+The stub name repo is a place for the original author to upload ‘modeling’ artifacts, eg. the code, container environment, etc.
+
+Phase 4:
+
+The stub name repo is cloned onto the NCI sever and the data is ‘added’ under the stub name repo. **Now a NCI DOI can be generated**!
+
+-------
