@@ -175,7 +175,7 @@ def dict_to_report(issue_dict, verbose = False):
         if "author" in issue_dict["software"]:
             report += "**Software framework authors:**  \n"
             for author in issue_dict["software"]["author"]:
-                if "givenName" in author:
+                if "givenName" and 'familyName' in author:
                     report += f"- {author['givenName']} {author['familyName']} "
                 elif "name" in author:
                     report += f"- {author['name']} "
@@ -269,7 +269,6 @@ def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list,
     Note:
     The function relies on external functions to load entity templates, apply mappings, and customize the RO-Crate. These functions need to be defined separately.
     """
-
 
 
 
