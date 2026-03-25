@@ -286,10 +286,29 @@ def parse_issue(issue):
 
     # license
     license = data["-> license"].strip()
+
+    def find_file_upwards( fName: str, maxLevels: int=5) -> str | None:
+        """
+        Search function to find file `fName` by relative path. 
+        Works by searching up a directory a maximum number of `maxLevels` from the cwd.
+        """
+        import os
+        
+        tmp = fName
+        for _ in range(maxLevels):
+            if os.path.exists( tmp ):
+                return tmp
+            else:
+                # go up one directory
+                tmp = '../' + tmp
+
+        raise RuntimeError(f"Couldn't find {fName}")
+
+    lfile = find_file_upwards('.github/resources/licenses.csv')
     try:
-        license_lut = pd.read_csv("../.github/resources/licenses.csv", dtype=str)
+        license_lut = pd.read_csv(lfile, dtype=str)
     except:
-        license_lut = pd.read_csv(".github/resources/licenses.csv", dtype=str)
+        raise RuntimeError("Can't read license file")
     #e.g. https://www.researchobject.org/ro-crate/1.1/contextual-entities.html#licensing-access-control-and-copyright
     #license,name,url,text,website_path
     license_record={"@type": "CreativeWork"}
