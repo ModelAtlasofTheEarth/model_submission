@@ -224,19 +224,19 @@ def parse_image_and_caption_old2(img_string, default_filename):
     BY_AI: Parses an image URL and caption from a Markdown or HTML image string (legacy version).
 
     Scans each line of the input string for a GitHub asset URL matching a known pattern.
-    Extracts the filename and URL using Markdown (`![alt](url)`) or HTML (`alt=... src=...`)
-    syntax. Lines that do not contain the URL pattern are collected as the caption.
-    Also attempts to determine the file extension from the HTTP Content-Type header for
-    image files.
+    Extracts the filename and URL using standard Markdown link syntax (`[filename](url)`)
+    or HTML (`alt=... src=...`) syntax. Lines that do not contain the URL pattern are
+    collected as the caption. Also attempts to determine the file extension from the
+    HTTP Content-Type header for image files.
 
     Note: This is an older version of the function; prefer `parse_image_and_caption`
     for new code.
 
     Parameters:
-        img_string (str): A multi-line string containing a Markdown or HTML image link
-            and optional caption lines.
+        img_string (str): A multi-line string containing a standard Markdown link or
+            HTML image link and optional caption lines.
         default_filename (str): The filename to use when only a bare URL is found (no
-            alt-text / filename is present in the link).
+            link text / filename is present in the link).
 
     Returns:
         tuple:
