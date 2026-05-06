@@ -17,7 +17,7 @@ def run_command_check_output(cmd):
 	Returns:
 	    bytes: The standard output of the command.
 	"""
-	return subprocess.check_output(cmd, shell=True, stderr=open(os.devnull))
+	return subprocess.check_output(cmd, shell=True, stderr=subprocess.DEVNULL)
 
 def encode(name, i):
 	"""
