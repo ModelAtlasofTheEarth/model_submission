@@ -78,12 +78,13 @@ def get_record(record_type, record_id):
                 url, headers=headers, timeout=TIMEOUT, allow_redirects=True
             )
             response.raise_for_status()  # Raise an exception for HTTP errors
-            # If the response is successful and contains content, parse and return the metadata
-            if response.content:
-                return response.json(), log
-
         except requests.exceptions.RequestException as e:
             log += f"Could not fetch metadata with {content_type} from {url}: {e}\n\n"
+            continue
+
+        # If the response is successful and contains content, parse and return the metadata
+        if response.content:
+            return response.json(), log
 
     # Failed to fetch record
     log += f"Failed to fetch metadata with All content types or URL.\n"
