@@ -7,55 +7,62 @@ from requests.packages.urllib3.util.retry import Retry
 BASE_URLS = {
     "publication": os.getenv("BASE_URL_PUBLICATION", "https://api.crossref.org/works/"),
     "software": os.getenv("BASE_URL_SOFTWARE", "https://doi.org/"),
-    "organization": os.getenv("BASE_URL_ORGANIZATION", "https://api.ror.org/organizations/"),
-    "author": os.getenv("BASE_URL_AUTHOR", "https://pub.orcid.org/v3.0/")
+    "organization": os.getenv(
+        "BASE_URL_ORGANIZATION", "https://api.ror.org/organizations/"
+    ),
+    "author": os.getenv("BASE_URL_AUTHOR", "https://pub.orcid.org/v3.0/"),
 }
-
 
 # Default timeout
 TIMEOUT = int(os.getenv("DEFAULT_TIMEOUT", 10))
-
-# Initialize a requests session
-session = requests.Session()
-
+MAX_RETRIES = 3
 
 # Configure retries
-max_retries = 3  # Set the maximum number of retries
-retry_strategy = Retry(
-    total=max_retries,
-    status_forcelist=[429, 500, 502, 503, 504],  # Specify which status codes to retry on
-    allowed_methods=["HEAD", "GET", "OPTIONS"],  # Use `allowed_methods` for urllib3 v1.26.0 or later
-    backoff_factor=1  # Defines the delay between retries
+_retry_strategy = Retry(
+    total=MAX_RETRIES,
+    status_forcelist=[ 429, 500, 502, 503, 504],  # Specify which status codes to retry on
+    allowed_methods=[ "HEAD", "GET", "OPTIONS"],  # Use `allowed_methods` for urllib3 v1.26.0 or later
+    backoff_factor=1,  # Defines the delay between retries
 )
-adapter = HTTPAdapter(max_retries=retry_strategy)
-session.mount("http://", adapter)
-session.mount("https://", adapter)
+
+_adapter = HTTPAdapter(max_retries=_retry_strategy)
+session = requests.Session()
+session.mount("http://", _adapter)
+session.mount("https://", _adapter)
 
 def get_record(record_type, record_id):
     """
-    BY_AI: Fetches a metadata record from a remote API for the given record type and identifier.
+    Fetch record "metadata" from a remote API.
 
-    Constructs the request URL from a lookup table of base URLs keyed by record type
-    ('publication', 'software', 'organization', 'author'). Tries fetching with
-    'application/ld+json' content type first, then falls back to 'application/json'.
-    The session is configured with automatic retries on common transient HTTP errors.
+    Attempts to retrieve metadata by constructing a URL from the provided
+    record type and ID, then trying multiple content types in order
+    (``application/ld+json``, then ``application/json``). Returns on the
+    first successful response.
 
-    Parameters:
-        record_type (str): The type of record to fetch. Must be one of the keys in
-            BASE_URLS ('publication', 'software', 'organization', 'author').
-        record_id (str): The identifier for the record (e.g. a DOI, ORCID iD, or ROR ID).
+    Parameters
+    ----------
+    record_type : str
+       Must be defined in BASE_URLS ['publication', 'software', organization', 'author'] 
 
-    Returns:
-        tuple:
-            metadata (dict): The parsed JSON response, or an empty dict if the fetch
-                failed.
-            log (str): A string containing any errors encountered during fetching.
+    record_id : str
+        The identifier of the record to be appended to the base URL.
 
-    Raises:
-        ValueError: If record_type is not a supported type.
+    Returns
+    -------
+    metadata : dict
+        The JSON response from the API, or an empty dict if all
+        attempts failed.
+    log : str
+        A string accumulating informational and warning messages generated
+        during the fetch process.
+
+    Raises
+    ------
+    ValueError
+        If ``record_type`` is not a key in ``BASE_URLS``.
     """
+
     log = ""
-    metadata = {}
 
     if record_type not in BASE_URLS:
         raise ValueError(f"Record type `{record_type}` not supported")
@@ -63,51 +70,51 @@ def get_record(record_type, record_id):
     url = BASE_URLS[record_type] + record_id
     print(url)
 
-    # Define content types to try
-    content_types = ["application/ld+json", "application/json"]
-
-    for content_type in content_types:
+    for content_type in ["application/ld+json", "application/json"]:
         headers = {"Content-Type": content_type, "Accept": content_type}
 
         try:
-            response = session.get(url, headers=headers, timeout=TIMEOUT, allow_redirects=True)
+            response = session.get(
+                url, headers=headers, timeout=TIMEOUT, allow_redirects=True
+            )
             response.raise_for_status()  # Raise an exception for HTTP errors
-
             # If the response is successful and contains content, parse and return the metadata
             if response.content:
-                metadata = response.json()
-                return metadata, log  # Successful fetch, return immediately
+                return response.json(), log
 
         except requests.exceptions.RequestException as e:
-            log += f"Error fetching metadata with {content_type} from {url}: {e}\n"
-            # Continue to the next URL or content type
+            log += f"Could not fetch metadata with {content_type} from {url}: {e}\n\n"
 
-    # If metadata is still empty after all attempts, log an error
-    if not metadata:
-        log += "Failed to fetch metadata with any content type or URL.\n"
-
-    return metadata, log
-
+    # Failed to fetch record
+    log += f"Failed to fetch metadata with All content types or URL.\n"
+    return {}, log
 
 def search_organization(org_url):
     """
-    BY_AI: Searches the ROR API for an organization matching the given URL and returns its ROR ID.
+    BY_AI: Search the org_url against the ROR (Research Organization Registry).
 
-    Strips the URL scheme and any trailing slash before querying
-    'https://api.ror.org/organizations?query.advanced=links:<org_url>'. If exactly one
-    result is found the ROR ID is returned; if multiple results are found the first is
-    used and a warning is logged.
+    Strips the URL scheme and any trailing slash before querying the ROR
+    advanced search endpoint. If exactly one result is returned it is used
+    directly; if multiple results are found the first is used and a warning
+    is raised. Parent-organization relationships are noted in the log.
 
-    Parameters:
-        org_url (str): The organization's homepage URL to search for.
+    Parameters
+    ----------
+    org_url : str
+        The website URL of the organization to look up
+        (e.g. ``"https://www.monash.edu/"``).
 
-    Returns:
-        tuple:
-            ror_id (str): The ROR identifier URL (e.g. 'https://ror.org/04yx6dh41'), or
-                an empty string if no match is found.
-            log (str): A string containing informational messages, warnings, or errors
-                generated during the search.
+    Returns
+    -------
+    ror_id : str
+        The ROR identifier URL for the matched organization
+        (e.g. ``"https://ror.org/02bfwt286"``), or an empty string if no
+        match was found.
+    log : str
+        A string accumulating informational and warning messages generated
+        during the search process.
     """
+
     log = ""
     ror_id = ""
     result = {}
@@ -115,10 +122,11 @@ def search_organization(org_url):
     base_url = "https://api.ror.org/organizations"
     org_url = org_url.split("://")[-1]
 
-    #Check if last character is a '/' and if so drop it
-    if org_url[-1] == "/": org_url = org_url[:-1]
+    # Check if last character is a '/' and if so drop it
+    if org_url[-1] == "/":
+        org_url = org_url[:-1]
 
-    url = base_url + '?query.advanced=links:' + org_url
+    url = base_url + "?query.advanced=links:" + org_url
     headers = {"Content-Type": "application/json"}
 
     try:
@@ -128,7 +136,7 @@ def search_organization(org_url):
         result = response.json()
 
     except requests.exceptions.RequestException as e:
-        log += f"Error fetching metadata: {e} \n"
+        log += f"Failed fetching metadata: {e} \n"
 
     # Deal with response and determine ROR ID
     if result["number_of_results"] == 0:
@@ -170,9 +178,10 @@ def check_uri(uri):
         return "OK"
 
     except Exception as err:
-        #return err.args[0]
-        return str(err)  # 01/05/24: Convert the error to a string to avoid TypeError when we concatenate to log
-
+        # return err.args[0]
+        return str(
+            err
+        )  # 01/05/24: Convert the error to a string to avoid TypeError when we concatenate to log
 
 
 def download_license_text(url):
