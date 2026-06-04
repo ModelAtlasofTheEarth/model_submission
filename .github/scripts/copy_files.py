@@ -49,7 +49,7 @@ def copy_files(repo,
                     print(f"Skipping {entry} as the file already exists")
                 else:
                     response = requests.get(url)
-                    new_path = save_path + "." + suffix
+                    new_path = save_path + suffix
                     repo.create_file(
                         new_path,
                         f"add {fname} to {new_path}",
