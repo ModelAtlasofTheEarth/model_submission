@@ -211,7 +211,7 @@ entry_list=["landing_image", "animation", "graphic_abstract", "model_setup_figur
 copy_files(repo = model_repo,
            entry_list = entry_list,
            issue_dict = data,
-           directory  = ".website_material/")
+           directory  = ".website_material/graphics/")
 
 # Report creation of repository
 issue.create_comment(f"Model repository created at https://github.com/{model_owner}/{model_repo_name}")
