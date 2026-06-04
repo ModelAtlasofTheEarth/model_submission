@@ -1,19 +1,19 @@
-name: Edit Issue Trigger
+name: Parse Issue Workflow
 on: 
   issues:
     types: 
       - edited
 jobs:
-  parseEditedIssue:
+  parseIssue:
     if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # setup python
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
           cache: "pip"
@@ -21,7 +21,7 @@ jobs:
 
       # find issue comment
       - name: find comment
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@v4
         id: fc
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -31,7 +31,7 @@ jobs:
 
       # Create m@te-bot token
       - name: create token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.APP_ID }}
