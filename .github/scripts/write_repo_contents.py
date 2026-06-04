@@ -173,9 +173,6 @@ update_info = model_repo.update_file(
 )
 print("README.md updated successfully!")
 
-
-
-
 #######
 # Add issue keywords as repository topics
 keywords = []
@@ -205,12 +202,16 @@ print(keywords)
 
 model_repo.replace_topics(keywords)
 
-
-
 # Copy web material to repo
 commit_message = 'Add issue dict. in json to website'
 model_repo.create_file(".website_material/index.json", commit_message, issue_dict_str)
-copy_files(model_repo, ".website_material/", data)
+
+# copy the following issue entries to the new repository
+entry_list=["landing_image", "animation", "graphic_abstract", "model_setup_figure"]
+copy_files(repo = model_repo,
+           entry_list = entry_list,
+           issue_dict = data,
+           directory  = ".website_material/")
 
 # Report creation of repository
 issue.create_comment(f"Model repository created at https://github.com/{model_owner}/{model_repo_name}")
