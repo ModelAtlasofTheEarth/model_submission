@@ -468,46 +468,43 @@ def parse_image_and_caption(img_string, default_filename):
 
 def extract_doi_parts(doi_string):
     """
-    BY_AI: Extracts a DOI from a string or URL and returns the cleaned DOI string.
+    Extracts a DOI from a DOI string, URL, or Zenodo record URL.
 
-    Uses a regular expression to locate a DOI pattern (starting with '10.' followed by
-    a registry code and suffix) within the input. Trailing punctuation characters that are
-    not valid DOI components are stripped before returning.
+    If the input is a Zenodo record URL (e.g. https://zenodo.org/records/6820562),
+    the DOI is constructed from the record ID. Otherwise, looks for a standard
+    DOI pattern (starting with '10.') within the input.
 
     Parameters:
-        doi_string (str): A string that may contain a DOI either as a bare identifier
-            or embedded within a URL (e.g. 'https://doi.org/10.1234/example').
+        doi_string (str): A string that may contain a DOI either as a bare identifier,
+            embedded within a URL (e.g. 'https://doi.org/10.1234/example'), or as a
+            Zenodo record URL.
 
     Returns:
         str: The extracted and cleaned DOI string, or 'No valid DOI found in the input
             string.' if no DOI pattern is detected.
     """
+    # Zenodo record URL → constructed DOI
+    # e.g. https://zenodo.org/records/6820562 → 10.5281/zenodo.6820562
+    zenodo_match = re.search(r'zenodo\.org/records?/(\d+)', doi_string)
+    if zenodo_match:
+        record_id = zenodo_match.group(1)
+        return f"10.5281/zenodo.{record_id}"
+
     # Regular expression to match a DOI within a string or URL
     # It looks for a string starting with '10.' followed by any non-whitespace characters
-    # and optionally includes common URL prefixes
-    # the DOI
     doi_pattern = re.compile(r'(10\.[0-9]+/[^ \s]+)')
 
-    # Search for DOI pattern in the input string
     match = doi_pattern.search(doi_string)
 
-    # If a DOI is found in the string
     if match:
-        # Extract the DOI
         doi = match.group(1)
 
-        # Clean up the DOI by removing any trailing characters that are not part of a standard DOI
-        # This includes common punctuation and whitespace that might be accidentally included
-        #doi = re.sub(r'[\s,.:;]+$', '', doi)
+        # Clean up the DOI by removing trailing punctuation that is not part of a standard DOI
         doi = re.sub(r'[\s,.:;|\/\?:@&=+\$,]+$', '', doi)
 
-        # Split the DOI into prefix and suffix at the first "/"
-        #prefix, suffix = doi.split('/', 1)
-
         return doi
-    else:
-        # Return an error message if no DOI is found
-        return "No valid DOI found in the input string."
+
+    return "No valid DOI found in the input string."
 
 
 def extract_orcid(input_str):
