@@ -70,7 +70,7 @@ def parse_issue(issue):
     Returns:
     - tuple: A tuple containing two elements:
         - data_dict (dict): A dictionary containing structured metadata extracted and processed from the issue.
-        - error_log (str): A string containing logged warnings and errors encountered during the parsing process.
+        - msg_log (str): A string containing logged warnings and errors encountered during the parsing process.
 
     Note:
     - The function assumes the presence of external helper functions for specific processing steps, such as `parse_name_or_orcid`, `validate_slug`, `load_entity_template`, `recursively_filter_key`, `load_crate_template`, `dict_to_ro_crate_mapping`, `customise_ro_crate`, `flatten_crate`, `parse_publication`, `get_record`, `get_authors`, `get_funders`, `check_uri`, `parse_software`, `parse_image_and_caption`, which need to be defined elsewhere.
@@ -83,7 +83,7 @@ def parse_issue(issue):
     data = read_issue_body(issue.body)
 
 
-    error_log = ""
+    msg_log = ""
 
 
     data_dict = {}
@@ -97,18 +97,18 @@ def parse_issue(issue):
     publication_record = {}
 
     if publication_doi == "_No response_":
-        error_log += "**Associated Publication**\n"
-        error_log += "Warning: No DOI provided. \n"
+        msg_log += "**Associated Publication**\n"
+        msg_log += "Warning: No DOI provided. \n"
     else:
         try:
             publication_metadata, log1 = get_record("publication", publication_doi)
             publication_record, log2 = parse_publication(publication_metadata)
             if log1 or log2:
-                error_log += "**Associated Publication**\n" + log1 + log2
+                msg_log += "**Associated Publication**\n" + log1 + log2
         except Exception as err:
-            error_log += "**Associated Publication**\n"
-            error_log += f"Error: unable to obtain metadata for DOI `{publication_doi}` \n"
-            error_log += f"`{err}`\n"
+            msg_log += "**Associated Publication**\n"
+            msg_log += f"Warning: unable to obtain metadata for DOI `{publication_doi}` \n"
+            msg_log += f"`{err}`\n"
 
     data_dict["publication"] = publication_record
 
@@ -123,34 +123,34 @@ def parse_issue(issue):
     software_record={"@type": "SoftwareApplication"}
 
     if software_doi == "_No response_":
-        error_log += "**Software Framework DOI/URI**\n"
-        error_log += "Warning: no DOI/URI provided.\n"
+        msg_log += "**Software Framework DOI/URI**\n"
+        msg_log += "Warning: no DOI/URI provided.\n"
 
     else:
         try:
             software_metadata, log1 = get_record("software", software_doi_only)
             software_record, log2 = parse_software(software_metadata, software_doi)
             if log1 or log2:
-                error_log += "**Software Framework DOI/URI**\n" + log1 + log2
+                msg_log += "**Software Framework DOI/URI**\n" + log1 + log2
         except Exception as err:
-            error_log += "**Software Framework DOI/URI**\n"
-            error_log += f"Error: unable to obtain metadata for DOI `{software_doi}` \n"
-            error_log += f"`{err}`\n"
+            msg_log += "**Software Framework DOI/URI**\n"
+            msg_log += f"Warning: unable to obtain metadata for DOI `{software_doi}` \n"
+            msg_log += f"`{err}`\n"
     #else:
-            #error_log += "**Software Framework DOI/URI**\n Non-Zenodo software dois not yet supported\n"
+            #msg_log += "**Software Framework DOI/URI**\n Non-Zenodo software dois not yet supported\n"
 
     # software framework source repository
     software_repo = data["-> software framework source repository"].strip()
 
     if software_repo == "_No response_":
-        error_log += "**Software Repository**\n"
-        error_log += "Warning: no repository URL provided. \n"
+        msg_log += "**Software Repository**\n"
+        msg_log += "Warning: no repository URL provided. \n"
     else:
         response = check_uri(software_repo)
         if response == "OK":
             software_record["codeRepository"] = software_repo
         else:
-            error_log += "**Software Repository**\n" + response + "\n"
+            msg_log += "**Software Repository**\n" + response + "\n"
 
     # name of primary software framework
     software_name = data["-> name of primary software framework (e.g. Underworld, ASPECT, Badlands, OpenFOAM)"].strip()
@@ -159,8 +159,8 @@ def parse_issue(issue):
         try:
             software_name = software_record['name']
         except:
-            error_log += "**Name of primary software framework**\n"
-            error_log += "Error: no name found \n"
+            msg_log += "**Name of primary software framework**\n"
+            msg_log += "Warning: no name found \n"
     else:
         software_record["name"] = software_name     # N.B. this will overwrite any name obtained from the DOI
 
@@ -173,13 +173,13 @@ def parse_issue(issue):
             software_author_list = software_record["author"]
         except:
             software_author_list = []
-            error_log += "**Software framework authors**\n"
-            error_log += "Error: no authors found \n"
+            msg_log += "**Software framework authors**\n"
+            msg_log += "Warning: no authors found \n"
     else:
         software_author_list, log = get_authors(authors)
         software_record["author"] = software_author_list     # N.B. this will overwrite any name obtained from the DOI
         if log:
-            error_log += "**Software framework authors**\n" + log
+            msg_log += "**Software framework authors**\n" + log
 
     # software & algorithm keywords
     #software_keywords = [x.strip() for x in data["-> software & algorithm keywords"].split(",")]
@@ -187,8 +187,8 @@ def parse_issue(issue):
 
     #if software_keywords[0] == "_No response_":
     if null_response_check(software_keywords[0]):
-        error_log += "**Software & algorithm keywords**\n"
-        error_log += "Warning: no keywords given. \n"
+        msg_log += "**Software & algorithm keywords**\n"
+        msg_log += "Warning: no keywords given. \n"
     else:
         software_record["keywords"] = software_keywords
 
@@ -205,7 +205,7 @@ def parse_issue(issue):
     submitter_record, log = parse_name_or_orcid(submitter)
     data_dict["submitter"] = submitter_record
     if log:
-        error_log += "**Submitter**\n" + log +"\n"
+        msg_log += "**Submitter**\n" + log +"\n"
 
     # model creators
     creators = data['-> model creators'].strip().split('\r\n')
@@ -218,8 +218,8 @@ def parse_issue(issue):
             creators_list = publication_record["author"]
         except:
             creators_list = []
-            error_log += "**Model creators**\n"
-            error_log += "Error: no creators found \n"
+            msg_log += "**Model creators**\n"
+            msg_log += "Warning: no creators found \n"
 
     #now if we got returned a response, try to parse it
     else:
@@ -230,7 +230,7 @@ def parse_issue(issue):
 
         creators_list, log = get_authors(creators)
         if log:
-            error_log += "**Model creators**\n" + log
+            msg_log += "**Model creators**\n" + log
 
     data_dict["creators"] = creators_list
 
@@ -246,12 +246,12 @@ def parse_issue(issue):
     #        contributors_list = publication_record["author"]
     #    except:
     #        contributors_list = []
-    #        error_log += "**Model contributors**\n"
-    #        error_log += "Error: no contributors found \n"
+    #        msg_log += "**Model contributors**\n"
+    #        msg_log += "Warning: no contributors found \n"
     #else:
     #    contributors_list, log = get_authors(contributors)
     #    if log:
-    #        error_log += "**Model contributors**\n" + log
+    #        msg_log += "**Model contributors**\n" + log
     #data_dict["contributors"] = contributors_list
 
     #now apply some logic? to the list of people involved...
@@ -272,7 +272,7 @@ def parse_issue(issue):
     slug, log = validate_slug(proposed_slug)
     data_dict["slug"] = slug
     if log:
-        error_log += "**Model Repository Slug**\n" + log + '\n'
+        msg_log += "**Model Repository Slug**\n" + log + '\n'
 
     # FoR codes
     about_record = {
@@ -329,8 +329,8 @@ def parse_issue(issue):
     #if model_category[0] == "_No response_":
     if null_response_check(model_category[0]):
         model_category = []
-        error_log += "**Model category**\n"
-        error_log += "Warning: No category selected \n"
+        msg_log += "**Model category**\n"
+        msg_log += "Warning: No category selected \n"
 
     data_dict["model_category"] = model_category
 
@@ -343,10 +343,10 @@ def parse_issue(issue):
 
         #if model_status[0] == "_No response_":
         if null_response_check(model_status[0]):
-            error_log += "**Model status**\n"
-            error_log += "Warning: No model status selected \n"
+            msg_log += "**Model status**\n"
+            msg_log += "Warning: No model status selected \n"
     except:
-        error_log += "Warning: No model status enrty found \n"
+        msg_log += "Warning: No model status enrty found \n"
     data_dict["model_status"] = model_status
 
 
@@ -359,8 +359,8 @@ def parse_issue(issue):
             title = publication_record['name']
         except:
             title = ""
-            error_log += "**Title**\n"
-            error_log += "Error: no title found \n"
+            msg_log += "**Title**\n"
+            msg_log += "Warning: no title found \n"
 
     data_dict["title"] = title
 
@@ -373,8 +373,8 @@ def parse_issue(issue):
             abstract = publication_record['abstract']
         except:
             abstract = ""
-            error_log += "**abstract**\n"
-            error_log += "Error: no abstract entered, nor abstract for associated publication \n"
+            msg_log += "**abstract**\n"
+            msg_log += "Warning: no abstract entered, nor abstract for associated publication \n"
 
     data_dict["abstract"] = abstract
 
@@ -389,8 +389,8 @@ def parse_issue(issue):
     #if keywords[0] == "_No response_":
     if null_response_check(keywords[0]):
         keywords = []
-        error_log += "**Scientific keywords**\n"
-        error_log += "Warning: No keywords given \n"
+        msg_log += "**Scientific keywords**\n"
+        msg_log += "Warning: No keywords given \n"
 
     data_dict["scientific_keywords"] = keywords
 
@@ -406,12 +406,12 @@ def parse_issue(issue):
     #        funder_list = publication_record['funder']
     #    except:
     #        funder_list = []
-    #        error_log += "**Funder**\n"
-    #        error_log += "Warning: No funders provided or found in publication. \n"
+    #        msg_log += "**Funder**\n"
+    #        msg_log += "Warning: No funders provided or found in publication. \n"
     #else:
     #    funder_list, log = get_funders(funders)
     #    if log:
-    #        error_log += "**Funder**\n" + log
+    #        msg_log += "**Funder**\n" + log
     #
     data_dict["funder"] = funders_dict['funders']
     data_dict["funding"] = funders_dict['funding']
@@ -434,9 +434,9 @@ def parse_issue(issue):
                 #leading/trailing whitespaces are okay, and get removed.
                 model_embargo = (True, date_input.strftime('%Y-%m-%d') )
             except:
-                error_log += "Could not parse Embargo date. Check format is  \n"
+                msg_log += "Warning: Could not parse Embargo date. Check format.\n"
     except:
-        error_log += "Warning: No model embargo entry found \n"
+        msg_log += "Warning: No model embargo entry found \n"
 
     data_dict["embargo"] = model_embargo
 
@@ -457,13 +457,13 @@ def parse_issue(issue):
     #if model_code_doi == "_No response_":
     if null_response_check(model_code_doi):
         model_code_doi = ""
-        error_log += "**Model code/inputs DOI**\n"
-        error_log += "Warning: No DOI/URI provided. \n"
+        msg_log += "**Model code/inputs DOI**\n"
+        msg_log += "Warning: No DOI/URI provided. \n"
     else:
         response = check_uri(model_code_doi)
         if response != "OK":
             model_code_doi = ""
-            error_log += f"**Model code/inputs DOI**\n {response} \n"
+            msg_log += f"**Model code/inputs DOI**\n {response} \n"
 
     model_code_record["doi"] = model_code_doi
 
@@ -473,8 +473,8 @@ def parse_issue(issue):
     #if model_code_notes == "_No response_":
     if null_response_check(model_code_notes):
         model_code_notes = ""
-        error_log += "**Model code/inputs notes**\n"
-        error_log += "Warning: No notes provided.\n"
+        msg_log += "**Model code/inputs notes**\n"
+        msg_log += "Warning: No notes provided.\n"
 
     model_code_record["notes"] = model_code_notes
 
@@ -504,12 +504,12 @@ def parse_issue(issue):
     if null_response_check(data_creators[0]):
         #if no respones, add the root entity creators
         data_creators_list = data_dict["creators"]
-        error_log += "**Model creators**\n"
-        error_log += "Error: no data creators found \n"
+        msg_log += "**Data creators**\n"
+        msg_log += "Warning: no data creators found \n"
     else:
         data_creators_list, log = get_authors(data_creators)
         if log:
-            error_log += "**Data creators**\n" + log
+            msg_log += "**Data creators**\n" + log
     model_output_record["creators"] = data_creators_list
 
 
@@ -521,13 +521,13 @@ def parse_issue(issue):
     if null_response_check(model_output_doi):
     #data_creators[0]
         model_output_doi = ""
-        error_log += "**Model output DOI**\n"
-        error_log += "Warning: No DOI/URI provided. \n"
+        msg_log += "**Model output DOI**\n"
+        msg_log += "Warning: No DOI/URI provided. \n"
     else:
         response = check_uri(model_output_doi)
         if response != "OK":
             model_output_doi = ""
-            error_log += "**Model output DOI**\n" + response + "\n"
+            msg_log += "**Model output DOI**\n" + response + "\n"
 
     model_output_record["doi"] = model_output_doi
 
@@ -537,8 +537,8 @@ def parse_issue(issue):
     #if model_output_notes == "_No response_":
     if null_response_check(model_output_notes):
         model_output_notes = ""
-        error_log += "**Model data notes**\n"
-        error_log += "Warning: No notes provided.\n"
+        msg_log += "**Model data notes**\n"
+        msg_log += "Warning: No notes provided.\n"
 
     model_output_record["notes"] = model_output_notes
 
@@ -549,13 +549,13 @@ def parse_issue(issue):
     #if model_output_size == "_No response_":
     if null_response_check(model_output_size):
             model_output_size = ""
-            error_log += "**Model data size**\n"
-            error_log += "Warning: No notes provided.\n"
+            msg_log += "**Model data size**\n"
+            msg_log += "Warning: No notes provided.\n"
 
-    data_bytes_value, size_error_log = parse_size(model_output_size)
+    data_bytes_value, size_msg_log = parse_size(model_output_size)
 
-    if size_error_log:
-        error_log +=size_error_log
+    if size_msg_log:
+        msg_log +=size_msg_log
 
     model_output_record["size"] = data_bytes_value
 
@@ -575,8 +575,8 @@ def parse_issue(issue):
     computer_uri = data["-> computer URI/DOI"].strip()
     #if computer_uri == "_No response_":
     if null_response_check(computer_uri):
-        error_log += "**Computer URI/DOI**\n"
-        error_log += "Warning: No URI/DOI provided. \n"
+        msg_log += "**Computer URI/DOI**\n"
+        msg_log += "Warning: No URI/DOI provided. \n"
     else:
         response = check_uri(computer_uri)
 
@@ -602,10 +602,10 @@ def parse_issue(issue):
             except:
                 pass
         else:
-            error_log += "**Computer URI/DOI**\n" + response + log1 + "\n"
+            msg_log += "**Computer URI/DOI**\n" + response + log1 + "\n"
 
             #except:
-            #error_log += "**Computer URI/DOI**\n" + "there was a problem parsing Computer URI/DOI" + log1 + "\n"
+            #msg_log += "**Computer URI/DOI**\n" + "there was a problem parsing Computer URI/DOI" + log1 + "\n"
 
 
     data_dict["computer_resource"] = computer_record
@@ -619,64 +619,64 @@ def parse_issue(issue):
 
     #if img_string == "_No response_":
     if null_response_check(img_string):
-        error_log += "**Landing page image**\n"
-        error_log += "Error: No image uploaded.\n\n"
+        msg_log += "**Landing page image**\n"
+        msg_log += "Warning: No image uploaded.\n\n"
         data_dict["landing_image"] = empty_image_record
     else:
         landing_image_record, log = parse_image_and_caption(img_string, "landing_image")
         if log:
-            error_log += "**Landing page image**\n" + log + "\n"
+            msg_log += "**Landing page image**\n" + log + "\n"
         data_dict["landing_image"] = landing_image_record
 
     # animation
     img_string = data["-> add an animation (if relevant)"].strip()
 
     if img_string == "_No response_":
-        error_log += "**Animation**\n"
-        error_log += "Warning: No animation uploaded.\n\n"
+        msg_log += "**Animation**\n"
+        msg_log += "Warning: No animation uploaded.\n\n"
         data_dict["animation"] = empty_image_record
     else:
         animation_record, log = parse_image_and_caption(img_string, "animation")
         if log:
-            error_log += "**Animation**\n" + log + "\n"
+            msg_log += "**Animation**\n" + log + "\n"
         data_dict["animation"] = animation_record
 
     # graphic abstract
     img_string = data["-> add a graphic abstract figure (if relevant)"].strip()
 
     if img_string == "_No response_":
-        error_log += "**Graphic abstract**\n"
-        error_log += "Warning: No image uploaded.\n\n"
+        msg_log += "**Graphic abstract**\n"
+        msg_log += "Warning: No image uploaded.\n\n"
         data_dict["graphic_abstract"] = empty_image_record
     else:
         graphic_abstract_record, log = parse_image_and_caption(img_string, "graphic_abstract")
         if log:
-            error_log += "**Graphic abstract**\n" + log + "\n"
+            msg_log += "**Graphic abstract**\n" + log + "\n"
         data_dict["graphic_abstract"] = graphic_abstract_record
 
     # model setup figure
     img_string = data["-> add a model setup figure (if relevant)"].strip()
 
     if img_string == "_No response_":
-        error_log += "**Model setup figure**\n"
-        error_log += "Warning: No image uploaded.\n\n"
+        msg_log += "**Model setup figure**\n"
+        msg_log += "Warning: No image uploaded.\n\n"
         data_dict["model_setup_figure"] = empty_image_record
     else:
         model_setup_fig_record, log = parse_image_and_caption(img_string, "model_setup")
         if log:
-            error_log += "**Model setup figure**\n" + log + "\n"
+            msg_log += "**Model setup figure**\n" + log + "\n"
         data_dict["model_setup_figure"] = model_setup_fig_record
 
     # description
     model_description = data["-> add a description of your model setup"].strip()
 
     if model_description == "_No response_":
-        error_log += "**Model setup description**\n"
-        error_log += "Warning: No description given \n"
+        msg_log += "**Model setup description**\n"
+        msg_log += "Warning: No description given \n"
     else:
         data_dict["model_setup_description"] = model_description
 
     # Add dateSubmitted
     data["dateSubmitted"] = datetime.now().isoformat()
 
-    return data_dict, error_log
+    return data_dict, msg_log
