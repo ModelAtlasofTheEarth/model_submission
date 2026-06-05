@@ -37,12 +37,13 @@ issue = repo.get_issue(number = issue_number)
 
 # Get model repo
 model_repo = g.get_repo(f"{model_owner}/{model_repo_name}")
+raw_base = f"https://raw.githubusercontent.com/{model_owner}/{model_repo_name}/main/"
 
 # Parse issue
 data, error_log = parse_issue(issue)
 
 # Convert dictionary to metadata json
-rocratestr_nested = dict_to_metadata(data, flat_compact_crate=False, timestamp= timestamp)
+rocratestr_nested = dict_to_metadata(data, flat_compact_crate=False, timestamp=timestamp, github_raw_base=raw_base)
 rocratedict = json.loads(rocratestr_nested)
 default_context_list = copy.deepcopy(rocratedict['@context'])
 #patch missign ids on Person Records
@@ -74,7 +75,7 @@ try:
 except:
     #use the flattening routine we wrote
     #this is not necessary fully compacted (although we try to build compact records)
-    flatcompact = dict_to_metadata(data, flat_compact_crate=True, timestamp= timestamp)
+    flatcompact = dict_to_metadata(data, flat_compact_crate=True, timestamp=timestamp, github_raw_base=raw_base)
 
 
 #FOR TESTING - print out dictionary as a comment
