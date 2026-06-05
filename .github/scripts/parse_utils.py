@@ -27,10 +27,10 @@ def validate_slug(proposed_slug):
         tuple:
             slug (str): A valid, available repository slug (may differ from
                 proposed_slug if the proposed name is already taken).
-            error_log (str): A string containing any warnings or errors encountered
+            msg_log (str): A string containing any warnings or errors encountered
                 during validation.
     """
-    error_log = ""
+    msg_log = ""
 
     try:
         slug_bits = proposed_slug.split("-")
@@ -38,9 +38,9 @@ def validate_slug(proposed_slug):
         assert len(slug_bits[1]) == 4, "Warning: year should be in the format `yyyy`\n"
         int(slug_bits[1])
     except ValueError:
-        error_log += "Warning: slug should be in the format `familyname-year-keyword` where year is a number in the format `yyyy`\n"
+        msg_log += "Warning: slug should be in the format `familyname-year-keyword` where year is a number in the format `yyyy`\n"
     except AssertionError as err:
-        error_log += f"{err}\n"
+        msg_log += f"{err}\n"
 
     #try a workaround for local tests
     cmd = "python3 .github/scripts/generate_identifier.py"
@@ -51,14 +51,14 @@ def validate_slug(proposed_slug):
     try:
         slug = subprocess.check_output(cmd, shell=True, text=True, stderr=open(os.devnull)).strip()
         if proposed_slug != slug:
-            error_log += f"Warning: Model repo cannot be created with proposed slug `{proposed_slug}`. \n"
-            error_log += f"Either propose a new slug or repo will be created with name `{slug}`. \n"
+            msg_log += f"Warning: Model repo cannot be created with proposed slug `{proposed_slug}`. \n"
+            msg_log += f"Either propose a new slug or repo will be created with name `{slug}`. \n"
     except Exception as err:
         slug = ""
-        error_log += "Error: Unable to create valid repo name... \n"
-        error_log += f"`{err}`\n"
+        msg_log += "Warning: Unable to create valid repo name... \n"
+        msg_log += f"`{err}`\n"
 
-    return slug, error_log
+    return slug, msg_log
 
 
 def parse_name_or_orcid(name_or_orcid):
@@ -72,14 +72,14 @@ def parse_name_or_orcid(name_or_orcid):
     dict: Author record.
     str: Error log.
     """
-    error_log = ""
+    msg_log = ""
     orcid_id = extract_orcid(name_or_orcid)
 
     if orcid_id:
         orcid_record, log1 = get_record("author", orcid_id)
         author_record, log2 = parse_author(orcid_record)
         if log1 or log2:
-            error_log += log1 + log2
+            msg_log += log1 + log2
         # Extract the name if present
         name_part = re.sub(r'\(.*?\)|\[.*?\]', '', name_or_orcid).strip()
         if name_part:
@@ -98,10 +98,10 @@ def parse_name_or_orcid(name_or_orcid):
                 "familyName": familyName,
             }
         except ValueError:
-            error_log += f"- Error: name `{name_or_orcid}` in unexpected format. Expected `last name(s), first name(s)` or ORCID.\n"
+            msg_log += f"- Warning: name `{name_or_orcid}` in unexpected format. Expected `last name(s), first name(s)` or ORCID.\n"
             author_record = {}
 
-    return author_record, error_log
+    return author_record, msg_log
 
 
 def parse_yes_no_choice(input):
@@ -153,11 +153,11 @@ def get_authors(author_list):
     authors = []
 
     for author in author_list:
-        author_record, error_log = parse_name_or_orcid(author)
+        author_record, msg_log = parse_name_or_orcid(author)
         if author_record:
             authors.append(author_record)
-        if error_log:
-            log += error_log
+        if msg_log:
+            log += msg_log
 
     return authors, log
 
@@ -274,7 +274,7 @@ def parse_image_and_caption_old2(img_string, default_filename):
                     # Try to match the HTML image format
                     image_record = re.search(html_regex, string).groupdict()
                 else:
-                    log += "Error: Could not parse image file and caption\n"
+                    log += "Warning: Could not parse image file and caption\n"
         else:
             caption.append(string)
 
@@ -292,7 +292,7 @@ def parse_image_and_caption_old2(img_string, default_filename):
     image_record["caption"] = "\n".join(caption)
 
     if not caption:
-        log += "Error: No caption found for image.\n"
+        log += "Warning: No caption found for image.\n"
 
     return image_record, log
 
@@ -346,9 +346,9 @@ def parse_image_and_caption_old(img_string, default_filename):
                     try:
                         image_record = html_regex.search(string).groupdict()
                     except AttributeError:
-                        log += f"Error: Could not parse HTML image format for line: {string}\n"
+                        log += f"Warning: Could not parse HTML image format for line: {string}\n"
                 else:
-                    log += f"Error: Could not parse image file and caption for line: {string}\n"
+                    log += f"Warning: Could not parse image file and caption for line: {string}\n"
         else:
             caption.append(string)
 
@@ -367,7 +367,7 @@ def parse_image_and_caption_old(img_string, default_filename):
     image_record["caption"] = "\n".join(caption)
 
     if not caption:
-        log += "Error: No caption found for image.\n"
+        log += "Warning: No caption found for image.\n"
 
     return image_record, log
 
@@ -432,7 +432,7 @@ def parse_image_and_caption(img_string, default_filename):
     if caption:
         image_record["caption"] = " ".join(caption)
     else:
-        log += "Error: No caption found for image.\n"
+        log += "Warning: No caption found for image.\n"
 
     # Check if URL is available
     if image_record["url"]:
@@ -445,7 +445,7 @@ def parse_image_and_caption(img_string, default_filename):
                 content_type = response.headers.get("Content-Type", "")
                 url_cache[image_record["url"]] = content_type  # Cache the response content type
             except requests.RequestException as e:
-                log += f"Error: Failed to download image. {str(e)}\n"
+                log += f"Warning: Failed to download image. {str(e)}\n"
                 content_type = ""
 
         if content_type.startswith("image"):
@@ -468,46 +468,43 @@ def parse_image_and_caption(img_string, default_filename):
 
 def extract_doi_parts(doi_string):
     """
-    BY_AI: Extracts a DOI from a string or URL and returns the cleaned DOI string.
+    Extracts a DOI from a DOI string, URL, or Zenodo record URL.
 
-    Uses a regular expression to locate a DOI pattern (starting with '10.' followed by
-    a registry code and suffix) within the input. Trailing punctuation characters that are
-    not valid DOI components are stripped before returning.
+    If the input is a Zenodo record URL (e.g. https://zenodo.org/records/6820562),
+    the DOI is constructed from the record ID. Otherwise, looks for a standard
+    DOI pattern (starting with '10.') within the input.
 
     Parameters:
-        doi_string (str): A string that may contain a DOI either as a bare identifier
-            or embedded within a URL (e.g. 'https://doi.org/10.1234/example').
+        doi_string (str): A string that may contain a DOI either as a bare identifier,
+            embedded within a URL (e.g. 'https://doi.org/10.1234/example'), or as a
+            Zenodo record URL.
 
     Returns:
         str: The extracted and cleaned DOI string, or 'No valid DOI found in the input
             string.' if no DOI pattern is detected.
     """
+    # Zenodo record URL → constructed DOI
+    # e.g. https://zenodo.org/records/6820562 → 10.5281/zenodo.6820562
+    zenodo_match = re.search(r'zenodo\.org/records?/(\d+)', doi_string)
+    if zenodo_match:
+        record_id = zenodo_match.group(1)
+        return f"10.5281/zenodo.{record_id}"
+
     # Regular expression to match a DOI within a string or URL
     # It looks for a string starting with '10.' followed by any non-whitespace characters
-    # and optionally includes common URL prefixes
-    # the DOI
     doi_pattern = re.compile(r'(10\.[0-9]+/[^ \s]+)')
 
-    # Search for DOI pattern in the input string
     match = doi_pattern.search(doi_string)
 
-    # If a DOI is found in the string
     if match:
-        # Extract the DOI
         doi = match.group(1)
 
-        # Clean up the DOI by removing any trailing characters that are not part of a standard DOI
-        # This includes common punctuation and whitespace that might be accidentally included
-        #doi = re.sub(r'[\s,.:;]+$', '', doi)
+        # Clean up the DOI by removing trailing punctuation that is not part of a standard DOI
         doi = re.sub(r'[\s,.:;|\/\?:@&=+\$,]+$', '', doi)
 
-        # Split the DOI into prefix and suffix at the first "/"
-        #prefix, suffix = doi.split('/', 1)
-
         return doi
-    else:
-        # Return an error message if no DOI is found
-        return "No valid DOI found in the input string."
+
+    return "No valid DOI found in the input string."
 
 
 def extract_orcid(input_str):
@@ -605,7 +602,7 @@ def parse_size(size_str, base_unit=1024):
         tuple: A tuple containing the parsed value (or None if it can't be parsed) and an error log string
     """
 
-    error_log = ""
+    msg_log = ""
     value = None
     try:
         size_str = size_str.replace(" ", "")  # remove spaces
@@ -627,11 +624,11 @@ def parse_size(size_str, base_unit=1024):
             }
             value = value * (base_unit ** units.get(unit, 0))
         else:
-            error_log = "Invalid size string"
+            msg_log = "Invalid size string"
     except ValueError as e:
-        error_log = str(e)
-    #print(value, error_log)
-    return value, error_log
+        msg_log = str(e)
+    #print(value, msg_log)
+    return value, msg_log
 
 def process_funding_data(input_string):
     """

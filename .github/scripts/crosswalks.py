@@ -245,7 +245,7 @@ def dict_to_report(issue_dict, verbose = False):
     return report
 
 
-def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list, filter_entities=True, flat_compact_crate=True, timestamp = False):
+def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list, filter_entities=True, flat_compact_crate=True, timestamp = False, github_raw_base = None):
 
     """
     Converts an issue dictionary into a standardized metadata format using Research Object Crate (RO-Crate) structure,
@@ -290,7 +290,7 @@ def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list,
     dict_to_ro_crate_mapping(ro_crate, issue_dict_copy,  mapping_list)
 
     #Add any further direct changes to the RO-Crate based on issue_dict
-    defaults_and_customise_ro_crate(issue_dict_copy, ro_crate, timestamp=timestamp)
+    defaults_and_customise_ro_crate(issue_dict_copy, ro_crate, timestamp=timestamp, github_raw_base=github_raw_base)
 
 
     #flatten the crate (brings nested entities to the top level)

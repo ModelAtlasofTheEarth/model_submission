@@ -642,7 +642,7 @@ def construct_full_url(base_url, identifier):
 
 
 
-def defaults_and_customise_ro_crate(issue_dict, ro_crate, timestamp=False):
+def defaults_and_customise_ro_crate(issue_dict, ro_crate, timestamp=False, github_raw_base=None):
 
     """
     Apply any defaults and or customising of the crate based on user input. There is some crossover here with parse_issue, which also applies some default fields
@@ -673,17 +673,68 @@ def defaults_and_customise_ro_crate(issue_dict, ro_crate, timestamp=False):
     if timestamp:
         ro_crate['@graph'][root_index]["datePublished"] = timestamp
 
-    #add any custom text, such as ["model_setup_description"]
 
+    # Add image/media entities for website graphics
+    from pathlib import Path
 
-    #add the project Description
-    #description repurposed for Plain Language Summary!!!
-    #proj_description = extract_project_description("ModelAtlasofTheEarth", "metadata_schema")
-    #ro_crate['@graph'][root_index]["description"] = proj_description
+    MIME_MAP = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
+        ".webp": "image/webp",
+        ".mp4": "video/mp4",
+        ".webm": "video/webm",
+        ".pdf": "application/pdf",
+    }
 
-    #resolve any potential issues with authorship and contribution
+    IMAGE_ENTRIES = [
+        ("landing_image",      "ImageObject",  "Landing page image"),
+        ("graphic_abstract",   "ImageObject",  "Graphic abstract"),
+        ("animation",          "MediaObject",  "Animation"),
+        ("model_setup_figure", "ImageObject",  "Model setup figure"),
+    ]
 
-    pass
+    for entry_key, entity_type, display_name in IMAGE_ENTRIES:
+        if entry_key not in issue_dict:
+            continue
+
+        img = issue_dict[entry_key]
+        url = img.get("url", "")
+        if not url:
+            continue
+
+        fname = img.get("filename")
+        if not fname:
+            continue
+
+        suffix = Path(fname).suffix
+        if not suffix:
+            continue
+
+        content_url = (
+            f"{github_raw_base}.website_material/graphics/{entry_key}{suffix}"
+            if github_raw_base else url
+        )
+
+        img_entity = {
+            "@id": entry_key,
+            "@type": entity_type,
+            "contentUrl": content_url,
+            "name": display_name,
+            "description": img.get("caption", ""),
+        }
+
+        mime = MIME_MAP.get(suffix.lower())
+        if mime:
+            img_entity["encodingFormat"] = mime
+
+        ro_crate['@graph'].append(img_entity)
+
+        if 'hasPart' not in ro_crate['@graph'][root_index]:
+            ro_crate['@graph'][root_index]['hasPart'] = []
+        ro_crate['@graph'][root_index]['hasPart'].append({"@id": entry_key})
 
 
 def build_context_list(urls):
