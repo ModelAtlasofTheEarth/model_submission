@@ -22,7 +22,7 @@ jobs:
       # Comment on issue
       - name: Comment on submission
         id: submission-comment
-        uses: GrantBirki/comment@v3.0.8
+        uses: GrantBirki/comment@v3.0.3
         with:
           token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
@@ -54,7 +54,7 @@ jobs:
 
       - name: comment on failure
         if: failure()
-        uses: GrantBirki/comment@v3.0.8
+        uses: GrantBirki/comment@v3.0.3
         with:
           token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
@@ -87,7 +87,7 @@ jobs:
 
       # Create notification comment
       - name: notify
-        uses: GrantBirki/comment@v3.0.8
+        uses: GrantBirki/comment@v3.0.3
         with:
           token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
@@ -134,7 +134,7 @@ jobs:
 
       - name: comment if unauthorized
         if: ${{ steps.verify_labeler.outputs.authorized == 'False' }}
-        uses: GrantBirki/comment@v2.0.8
+        uses: GrantBirki/comment@v3.0.3
         with:
           token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
@@ -210,7 +210,7 @@ jobs:
 
       - name: comment on failure
         if: failure()
-        uses: GrantBirki/comment@v2.0.8
+        uses: GrantBirki/comment@v3.0.3
         with:
           token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
