@@ -64,10 +64,19 @@ jobs:
 
       - name: add fail label
         if: failure()
-        uses: actions-ecosystem/action-add-labels@v1.1.0
+        uses: actions/github-script@v9
         with:
-          github_token: ${{ steps.app-token.outputs.token }}
-          labels: workflow_error
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['workflow_error']
+            })
+        # uses: actions-ecosystem/action-add-labels@v1.1.0
+        # with:
+        #   github_token: ${{ steps.app-token.outputs.token }}
+        #   labels: workflow_error
 
 
   requestReview:
@@ -221,13 +230,36 @@ jobs:
 
       - name: add fail label
         if: failure()
-        uses: actions-ecosystem/action-add-labels@v1.1.0
+        uses: actions/github-script@v9
         with:
-          github_token: ${{ steps.app-token.outputs.token }}
-          labels: workflow_error
-
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['workflow_error']
+            })
+      
       - name: add model created label
-        uses: actions-ecosystem/action-add-labels@v1.1.0
+        uses: actions/github-script@v9
         with:
-          github_token: ${{ steps.app-token.outputs.token }}
-          labels: model created
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['model created']
+            })
+            
+      # - name: add fail label
+      #   if: failure()
+      #   uses: actions-ecosystem/action-add-labels@v1.1.0
+      #   with:
+      #     github_token: ${{ steps.app-token.outputs.token }}
+      #     labels: workflow_error
+
+      # - name: add model created label
+      #   uses: actions-ecosystem/action-add-labels@v1.1.0
+      #   with:
+      #     github_token: ${{ steps.app-token.outputs.token }}
+      #     labels: model created
