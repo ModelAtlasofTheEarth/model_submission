@@ -89,7 +89,7 @@ jobs:
       - name: notify
         uses: GrantBirki/comment@v3.0.8
         with:
-          token: ${{ steps.appGrantBirki/comment@-token.outputs.token }}
+          token: ${{ steps.app-token.outputs.token }}
           issue-number: ${{ github.event.issue.number }}
           file: .github/templates/review-request.md
           vars: |
