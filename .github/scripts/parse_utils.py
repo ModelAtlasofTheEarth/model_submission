@@ -376,11 +376,12 @@ url_cache = {}
 
 def parse_image_and_caption(img_string, default_filename):
     """
-    BY_AI: Parses an image URL and caption from a Markdown image string (current version).
+    BY_AI: Parses an image URL and caption from a Markdown or HTML image string.
 
-    Scans each line of the input for a Markdown image link (`[filename](url)`) or a bare
-    GitHub asset URL. Remaining lines are joined to form the caption. The function also
-    makes an HTTP request to detect the file's MIME type and appends the correct extension
+    Scans each line of the input for a Markdown image link (`[filename](url)`),
+    an HTML `<img alt="filename" src="url">` tag, or a bare GitHub asset URL.
+    Remaining lines are joined to form the caption. The function also makes an
+    HTTP request to detect the file's MIME type and appends the correct extension
     to the filename if needed. Results are cached to avoid redundant HTTP requests.
 
     Image and animation filenames are prefixed with 'graphics/' unless already present.
@@ -400,11 +401,20 @@ def parse_image_and_caption(img_string, default_filename):
     log = ""
     image_record = {"filename": None, "url": "", "caption": ""}
 
-    # Precompile regex patterns for Markdown image links
+    # Precompile regex patterns
     md_regex = re.compile(r"\[(?P<filename>[^]]+)\]\((?P<url>https?://[^\s)]+)\)")
-    
+    # Regex to match HTML <img> syntax: alt/src in either order
+    html_regex = re.compile(
+        r'(?:'
+        r'alt="(?P<filename>[^"]+)"[^>]*src="(?P<url>https?://[^\s"]+)"'
+        r'|'
+        r'src="(?P<url2>https?://[^\s"]+)"[^>]*alt="(?P<filename2>[^"]+)"'
+        r')'
+    )
     # Combined pattern to match both old and new GitHub URL structures
-    pattern = re.compile(r"https://github.com/(?:ModelAtlasofTheEarth/[^/]+/(?:assets|files)/|user-attachments/assets/)")
+    pattern = re.compile(
+        r"https://github.com/(?:ModelAtlasofTheEarth/[^/]+/(?:assets|files)/|user-attachments/assets/)"
+    )
 
     # Adding support for SVG files
     filetype.add_type(Svg())
@@ -417,10 +427,19 @@ def parse_image_and_caption(img_string, default_filename):
         md_match = md_regex.search(line)  
         if md_match:
             # Extract filename and URL
-            image_record["filename"] = md_match.group("filename").strip()  # Strip whitespace
-            image_record["url"] = md_match.group("url").strip()  # Strip whitespace
+            image_record["filename"] = md_match.group("filename").strip()
+            image_record["url"] = md_match.group("url").strip()
+        elif html_match := html_regex.search(line):
+            # Handle HTML <img alt="..." src="..."> in either attribute order
+            filename = html_match.group("filename") or html_match.group("filename2")
+            url = html_match.group("url") or html_match.group("url2")
+            if filename and url:
+                image_record["filename"] = filename.strip()
+                image_record["url"] = url.strip()
+            else:
+                log += f"Warning: Could not parse HTML image format for line: {line}\n"
         elif pattern.search(line):
-            # Fallback for direct URL parsing (though this shouldn't be necessary now)
+            # Fallback for bare URL
             if line.startswith("https://"):
                 image_record["filename"] = default_filename
                 image_record["url"] = line
