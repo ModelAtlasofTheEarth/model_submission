@@ -25,20 +25,26 @@ def parse_author(metadata):
         log += "ORCID metadata record succesfully extracted in json-ld format \n"
 
     else:
-
         try:
             author_record = {
                 "@type": "Person",
                 "@id": metadata["orcid-identifier"]["uri"],
-                "givenName": metadata['person']['name']['given-names']['value'],
-                "familyName": metadata['person']['name']['family-name']['value'],
+                "givenName": metadata["person"]["name"]["given-names"]["value"],
+                "familyName": metadata["person"]["name"]["family-name"]["value"],
             }
 
             affiliation_list = []
-            for affiliation in metadata["activities-summary"]["employments"]["affiliation-group"]:
+            for affiliation in metadata["activities-summary"]["employments"][
+                "affiliation-group"
+            ]:
                 summary = affiliation["summaries"][0]["employment-summary"]
                 if summary["end-date"] is None:
-                    affiliation_list.append({"@type": "Organization", "name": summary["organization"]["name"]})
+                    affiliation_list.append(
+                        {
+                            "@type": "Organization",
+                            "name": summary["organization"]["name"],
+                        }
+                    )
 
             if affiliation_list:
                 author_record["affiliation"] = affiliation_list
@@ -48,6 +54,7 @@ def parse_author(metadata):
             log += f"`{err}`\n"
 
     return author_record, log
+
 
 def parse_organization(record):
     """
@@ -66,7 +73,9 @@ def parse_organization(record):
         # ✅ Handle modern ROR format (name inside 'names' list)
         if "name" in record and isinstance(record["name"], str):
             org["name"] = record["name"]
-        elif "names" in record and isinstance(record["names"], list) and record["names"]:
+        elif (
+            "names" in record and isinstance(record["names"], list) and record["names"]
+        ):
             org["name"] = record["names"][0].get("value", "")
         else:
             org["name"] = "(unknown name)"
@@ -114,21 +123,21 @@ def parse_software(metadata, doi):
     log = ""
     software_record = {}
 
-    #here we check if software metdata was found in json-ld
-    #if so, we simply return the record
+    # here we check if software metdata was found in json-ld
+    # if so, we simply return the record
     if "@type" and "@id" in metadata.keys():
         software_record = metadata
         log += "doi.org metadata record succesfully extracted in json-ld format \n"
 
-    #if not, we'll try to a schema.org entity from the json
+    # if not, we'll try to a schema.org entity from the json
     else:
         software_record["@type"] = "SoftwareApplication"
         software_record["@id"] = doi
-        #try:
+        # try:
         found_something = False
         if "title" in metadata.keys():
             software_record["name"] = metadata["title"]
-            print('found title')
+            print("found title")
             found_something = True
         if "metadata" in metadata.keys():
             if "version" in metadata["metadata"].keys():
@@ -136,7 +145,6 @@ def parse_software(metadata, doi):
                 found_something = True
 
             if "creators" in metadata["metadata"].keys():
-
                 author_list = []
 
                 for author in metadata["metadata"]["creators"]:
@@ -157,13 +165,13 @@ def parse_software(metadata, doi):
                 found_something = True
                 software_record["author"] = author_list
 
-
-        #except Exception as err
+        # except Exception as err
         if found_something is False:
             log += "Error: unable to parse software metadata. \n"
-            #log += f"`{err}`\n"
+            # log += f"`{err}`\n"
 
     return software_record, log
+
 
 def parse_publication(metadata):
     """
@@ -188,7 +196,7 @@ def parse_publication(metadata):
     log = ""
     publication_record = {}
 
-    metadata = metadata['message']
+    metadata = metadata["message"]
 
     if "@type" and "@id" in metadata.keys():
         publication_record = metadata
@@ -199,29 +207,32 @@ def parse_publication(metadata):
                 "@type": "ScholarlyArticle",
                 "@id": metadata["URL"],
                 "name": metadata["title"][0],
-                }
+            }
 
             if "issue" in metadata:
-                publication_issue = {
-                    "@type": "PublicationIssue",
-                    "issueNumber": metadata["issue"],
-                    "datePublished": '-'.join(map(str,metadata["published"]["date-parts"][0])),
-                    "isPartOf": {
-                        "@type": [
-                            "PublicationVolume",
-                            "Periodical"
-                        ],
-                        "name": metadata["container-title"],
-                        "issn": metadata["ISSN"],
-                        "volumeNumber": metadata["volume"],
-                        "publisher": metadata["publisher"]
+                publication_issue = (
+                    {
+                        "@type": "PublicationIssue",
+                        "issueNumber": metadata["issue"],
+                        "datePublished": "-".join(
+                            map(str, metadata["published"]["date-parts"][0])
+                        ),
+                        "isPartOf": {
+                            "@type": ["PublicationVolume", "Periodical"],
+                            "name": metadata["container-title"],
+                            "issn": metadata["ISSN"],
+                            "volumeNumber": metadata["volume"],
+                            "publisher": metadata["publisher"],
+                        },
                     },
-                },
+                )
 
                 publication_record["isPartOf"] = publication_issue
             else:
                 if metadata["published"]:
-                    publication_record["datePublished"] = '-'.join(map(str,metadata["published"]["date-parts"][0]))
+                    publication_record["datePublished"] = "-".join(
+                        map(str, metadata["published"]["date-parts"][0])
+                    )
                 if metadata["publisher"]:
                     publication_record["publisher"] = metadata["publisher"]
 
@@ -236,7 +247,9 @@ def parse_publication(metadata):
 
                 affiliation_list = []
                 for affiliation in author["affiliation"]:
-                    affiliation_list.append({"@type": "Organization", "name": affiliation["name"]})
+                    affiliation_list.append(
+                        {"@type": "Organization", "name": affiliation["name"]}
+                    )
 
                 if affiliation_list:
                     author_record["affiliation"] = affiliation_list
@@ -247,7 +260,9 @@ def parse_publication(metadata):
                 publication_record["author"] = author_list
 
             if "abstract" in metadata:
-                publication_record["abstract"] = metadata["abstract"].split('<jats:p>')[1].split('</jats:p>')[0]
+                publication_record["abstract"] = (
+                    metadata["abstract"].split("<jats:p>")[1].split("</jats:p>")[0]
+                )
 
             if "page" in metadata:
                 publication_record["pagination"] = metadata["page"]
@@ -258,7 +273,9 @@ def parse_publication(metadata):
             if "funder" in metadata:
                 funder_list = []
                 for funder in metadata["funder"]:
-                    funder_list.append({"@type": "Organization", "name": funder["name"]})
+                    funder_list.append(
+                        {"@type": "Organization", "name": funder["name"]}
+                    )
                 publication_record["funder"] = funder_list
 
         except Exception as err:
