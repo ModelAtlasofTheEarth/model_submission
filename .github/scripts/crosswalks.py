@@ -7,9 +7,7 @@ import pandas as pd
 from config import MATE_GADI
 
 
-
-def dict_to_report(issue_dict, verbose = False):
-
+def dict_to_report(issue_dict, verbose=False):
     """
     Generates a detailed report in Markdown format based on the provided issue dictionary.The function supports a verbose mode that includes additional details such as software framework authors and a dictionary dump for testing purposes.
 
@@ -44,8 +42,10 @@ def dict_to_report(issue_dict, verbose = False):
 
     # slug, this gets mapped to name. This is what the model is called on NCI
     report += "**Model slug:**  \n\n"
-    report += f"`{issue_dict['slug']}` \n\n" + "(this will be the name of the model repository when created) \n\n"
-
+    report += (
+        f"`{issue_dict['slug']}` \n\n"
+        + "(this will be the name of the model repository when created) \n\n"
+    )
 
     # title. Note title doesn't appear in CreativeWorks. This gets mapped to alternateName.
     report += "**Model name:**  \n\n"
@@ -83,8 +83,6 @@ def dict_to_report(issue_dict, verbose = False):
     report += "**Abstract:**  \n\n"
     report += issue_dict["abstract"] + "\n\n"
 
-
-
     # scientific keywords
     if issue_dict["scientific_keywords"]:
         report += "**Scientific Keywords:**  \n\n"
@@ -95,7 +93,7 @@ def dict_to_report(issue_dict, verbose = False):
     # funder
     report += "**Funder(s):**  \n"
     for funder in issue_dict["funder"]:
-        if 'name' in funder.keys():
+        if "name" in funder.keys():
             report += f"- {funder['name']} "
             if "@id" in funder:
                 report += f"({funder['@id']})"
@@ -103,7 +101,6 @@ def dict_to_report(issue_dict, verbose = False):
                 report += f"({funder['url']})"
             report += "  \n"
     report += "  \n"
-
 
     #############
     # Section 2
@@ -117,8 +114,7 @@ def dict_to_report(issue_dict, verbose = False):
             report += "**Embargo on model contents requested until:**   \n\n"
             report += f"{issue_dict['embargo'][1]} \n\n"
         else:
-            report +=  "**No embargo on model contents requested** \n\n"
-
+            report += "**No embargo on model contents requested** \n\n"
 
     # include model code
     if "include_model_code" in issue_dict:
@@ -150,7 +146,6 @@ def dict_to_report(issue_dict, verbose = False):
         report += "**Model output data notes:**   \n\n"
         report += f"{issue_dict['model_output_data']['notes']} \n\n"
 
-
     #############
     # Section 3
     #############
@@ -171,11 +166,11 @@ def dict_to_report(issue_dict, verbose = False):
         report += f"{issue_dict['software']['name']} \n\n"
 
     if verbose is True:
-        #software framework authors
+        # software framework authors
         if "author" in issue_dict["software"]:
             report += "**Software framework authors:**  \n"
             for author in issue_dict["software"]["author"]:
-                if "givenName" and 'familyName' in author:
+                if "givenName" in author and "familyName" in author:
                     report += f"- {author['givenName']} {author['familyName']} "
                 elif "name" in author:
                     report += f"- {author['name']} "
@@ -183,7 +178,6 @@ def dict_to_report(issue_dict, verbose = False):
                     report += f"([{author['@id'].split('/')[-1]}]({author['@id']}))"
                 report += "  \n"
             report += "  \n"
-
 
     # software & algorithm keywords
     if "keywords" in issue_dict["software"]:
@@ -208,7 +202,7 @@ def dict_to_report(issue_dict, verbose = False):
             report += f"Filename: [{issue_dict['landing_image']['filename']}]({issue_dict['landing_image']['url']})  \n"
         if "caption" in issue_dict["landing_image"]:
             report += f"Caption: {issue_dict['landing_image']['caption']}  \n"
-        report += '  \n'
+        report += "  \n"
 
     # animation
     if "animation" in issue_dict:
@@ -217,7 +211,7 @@ def dict_to_report(issue_dict, verbose = False):
             report += f"Filename: [{issue_dict['animation']['filename']}]({issue_dict['animation']['url']})  \n"
         if "caption" in issue_dict["animation"]:
             report += f"Caption: {issue_dict['animation']['caption']}  \n"
-        report += '  \n'
+        report += "  \n"
 
     # graphic abstract
     if "graphic_abstract" in issue_dict:
@@ -226,7 +220,7 @@ def dict_to_report(issue_dict, verbose = False):
             report += f"Filename: [{issue_dict['graphic_abstract']['filename']}]({issue_dict['graphic_abstract']['url']})  \n"
         if "caption" in issue_dict["graphic_abstract"]:
             report += f"Caption: {issue_dict['graphic_abstract']['caption']}  \n"
-        report += '  \n'
+        report += "  \n"
 
     # model setup figure
     if "model_setup_figure" in issue_dict:
@@ -236,17 +230,21 @@ def dict_to_report(issue_dict, verbose = False):
         if "caption" in issue_dict["model_setup_figure"]:
             report += f"Caption: {issue_dict['model_setup_figure']['caption']}  \n"
         if "model_setup_description" in issue_dict:
-                #report += "**Model setup description:**  \n"
-                report += f"Description:  {issue_dict['model_setup_description']}\n\n"
-        report += '  \n'
-
-
+            # report += "**Model setup description:**  \n"
+            report += f"Description:  {issue_dict['model_setup_description']}\n\n"
+        report += "  \n"
 
     return report
 
 
-def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list, filter_entities=True, flat_compact_crate=True, timestamp = False, github_raw_base = None):
-
+def dict_to_metadata(
+    issue_dict,
+    mapping_list=default_issue_entity_mapping_list,
+    filter_entities=True,
+    flat_compact_crate=True,
+    timestamp=False,
+    github_raw_base=None,
+):
     """
     Converts an issue dictionary into a standardized metadata format using Research Object Crate (RO-Crate) structure,
     applying entity simplification and mappings based on predefined templates and rules.
@@ -270,45 +268,42 @@ def dict_to_metadata(issue_dict, mapping_list=default_issue_entity_mapping_list,
     The function relies on external functions to load entity templates, apply mappings, and customize the RO-Crate. These functions need to be defined separately.
     """
 
-
-
     # Perform a deep copy of the issue_dict to avoid modifying the input dictionary
     issue_dict_copy = copy.deepcopy(issue_dict)
 
-    #this takes the issue_dict and simplifies entities (e.g. @Type=Person) using templates defined at:
-    #https://github.com/ModelAtlasofTheEarth/metadata_schema/blob/main/mate_ro_crate/type_templates.json
+    # this takes the issue_dict and simplifies entities (e.g. @Type=Person) using templates defined at:
+    # https://github.com/ModelAtlasofTheEarth/metadata_schema/blob/main/mate_ro_crate/type_templates.json
     if filter_entities is True:
         entity_template = load_entity_template()
         recursively_filter_key(issue_dict_copy, entity_template)
 
-    #load the RO-Crate template as a Python dictionary
-    #$print(ro_crate.keys())
-    #>>>dict_keys(['@context', '@graph'])
+    # load the RO-Crate template as a Python dictionary
+    # $print(ro_crate.keys())
+    # >>>dict_keys(['@context', '@graph'])
     ro_crate = load_crate_template()
 
-    #Apply direct mappings between the issue_dict and the RO-Crate
-    dict_to_ro_crate_mapping(ro_crate, issue_dict_copy,  mapping_list)
+    # Apply direct mappings between the issue_dict and the RO-Crate
+    dict_to_ro_crate_mapping(ro_crate, issue_dict_copy, mapping_list)
 
-    #Add any further direct changes to the RO-Crate based on issue_dict
-    defaults_and_customise_ro_crate(issue_dict_copy, ro_crate, timestamp=timestamp, github_raw_base=github_raw_base)
+    # Add any further direct changes to the RO-Crate based on issue_dict
+    defaults_and_customise_ro_crate(
+        issue_dict_copy, ro_crate, timestamp=timestamp, github_raw_base=github_raw_base
+    )
 
-
-    #flatten the crate (brings nested entities to the top level)
+    # flatten the crate (brings nested entities to the top level)
     if flat_compact_crate is True:
         flatten_crate(ro_crate)
         # flatten a document
         # see: https://json-ld.org/spec/latest/json-ld/#flattened-document-form
         # all deep-level trees flattened to the top-level
-        #ro_crate= jsonld.flatten(ro_crate)
+        # ro_crate= jsonld.flatten(ro_crate)
 
     metadata_out = json.dumps(ro_crate)
 
     return metadata_out
 
 
-
 def metadata_to_nci(ro_crate):
-
     """
     BY_AI: Converts an RO-Crate dictionary into an NCI/ISO metadata record as a pandas DataFrame.
 
@@ -327,26 +322,34 @@ def metadata_to_nci(ro_crate):
             metadata fields, author rows, and funder rows concatenated in order.
     """
 
-    #put the @graph array into a dictionary/nested format, where the @id field becomes the key
+    # put the @graph array into a dictionary/nested format, where the @id field becomes the key
     ro_crate_nested = graph_to_nested_dict(ro_crate["@graph"])
-    #extract funders and authors into a NCI/ISO format
+    # extract funders and authors into a NCI/ISO format
     funders = extract_funder_details(ro_crate_nested)
     authors = extract_creator_details(ro_crate_nested)
-    root = 'root'  # Key for root element
+    root = "root"  # Key for root element
 
-    #build up any composite values
-    nci_file_path =  MATE_GADI + ro_crate_nested.get_nested(f"{root}.alternateName")
+    # build up any composite values
+    nci_file_path = MATE_GADI + ro_crate_nested.get_nested(f"{root}.alternateName")
 
     fields_data = {
         "Title*": list_to_string(ro_crate_nested.get_nested(f"{root}.name")),
-        "Dataset version*": list_to_string(ro_crate_nested.get_nested(f"{root}.version")),
+        "Dataset version*": list_to_string(
+            ro_crate_nested.get_nested(f"{root}.version")
+        ),
         "Abstract*": list_to_string(ro_crate_nested.get_nested(f"{root}.abstract")),
         "Topic category*": "geoscientificInformation",
-        "Field of research (FOR)*": list_to_string(ro_crate_nested.get_nested(f"{root}.about.@id")),
+        "Field of research (FOR)*": list_to_string(
+            ro_crate_nested.get_nested(f"{root}.about.@id")
+        ),
         "License*": ro_crate_nested.get_nested(f"{root}.license.description"),
-        "Dataset lineage information*": list_to_string(ro_crate_nested.get_nested(f"{root}.description")),
+        "Dataset lineage information*": list_to_string(
+            ro_crate_nested.get_nested(f"{root}.description")
+        ),
         "Dataset format*": "",
-        "Dataset status": list_to_string(ro_crate_nested.get_nested(f"{root}.creativeWorkStatus")),
+        "Dataset status": list_to_string(
+            ro_crate_nested.get_nested(f"{root}.creativeWorkStatus")
+        ),
         "Maintenance frequency*": "as needed",
         "Temporal extents* (if applicable)": "",
         "Spatial extents* (if applicable)": "",
@@ -354,24 +357,27 @@ def metadata_to_nci(ro_crate):
         "Credit": "",
         "Supplemental or supporting material": "",
         "Local NCI file path": nci_file_path,
-        "DOI (NCI Internal Field)": list_to_string(ro_crate_nested.get_nested(f"{root}.identifier")),
-        "Keyword/s": list_to_string(ro_crate_nested.get_nested(f"{root}.keywords"))
+        "DOI (NCI Internal Field)": list_to_string(
+            ro_crate_nested.get_nested(f"{root}.identifier")
+        ),
+        "Keyword/s": list_to_string(ro_crate_nested.get_nested(f"{root}.keywords")),
     }
 
     fields_df = pd.DataFrame(list(fields_data.items()), columns=["Field", "Value"])
 
-    #update specific fields that need tailoring
-    #ro_crate_data['@graph'][1]['alternateName']
+    # update specific fields that need tailoring
+    # ro_crate_data['@graph'][1]['alternateName']
 
-    #fields_df
-    #nci_file_path = ro_crate_nested.get_nested(f"{root}.alternateName")
-    #"Local NCI file path": "",
-
-
+    # fields_df
+    # nci_file_path = ro_crate_nested.get_nested(f"{root}.alternateName")
+    # "Local NCI file path": "",
 
     # Handling authors as before
     authors_rows = [
-        {"Field": f"Author {i}", "Value": f"{author['Last name']}, {author['First name']}, {author['Organization']}, {author['Email']}, {author['ORCID ID']}"}
+        {
+            "Field": f"Author {i}",
+            "Value": f"{author['Last name']}, {author['First name']}, {author['Organization']}, {author['Email']}, {author['ORCID ID']}",
+        }
         for i, author in enumerate(authors, start=1)
     ]
     authors_df = pd.DataFrame(authors_rows)
@@ -379,11 +385,20 @@ def metadata_to_nci(ro_crate):
     # Handling funders
     funder_rows = []
     for funder in funders:
-        funder_rows.append({"Field": "Organisation/funding agency name", "Value": funder['name']})
-        funder_rows.append({"Field": "Funding/award description or title", "Value": funder['grant_id']})
-        funder_rows.append({"Field": "Email address for the organisation/agency (if applicable)", "Value": funder['email']})
+        funder_rows.append(
+            {"Field": "Organisation/funding agency name", "Value": funder["name"]}
+        )
+        funder_rows.append(
+            {"Field": "Funding/award description or title", "Value": funder["grant_id"]}
+        )
+        funder_rows.append(
+            {
+                "Field": "Email address for the organisation/agency (if applicable)",
+                "Value": funder["email"],
+            }
+        )
     funders_df = pd.DataFrame(funder_rows)
 
     # Concatenate all parts into a single DataFrame
-    result_df = pd.concat([fields_df, authors_df, funders_df ], ignore_index=True)
+    result_df = pd.concat([fields_df, authors_df, funders_df], ignore_index=True)
     return result_df

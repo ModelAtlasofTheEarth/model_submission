@@ -1,0 +1,28 @@
+[workspace]
+authors = ["julian <house.of.jules@gmail.com>"]
+channels = ["conda-forge", "main", "r", "msys2"]
+name = "mate-github"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.11.*"
+pandas = "*"
+requests = "*"
+urllib3 = "*"
+ipython = "*"
+ipdb = "*"
+ipykernel = "*"
+jupyterlab = "*"
+pygithub = "*"
+filetype = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
+markdown = "*"
+python-dotenv = "*"
+pip = "*"
+
+[pypi-dependencies]
+tqdm = "*"
