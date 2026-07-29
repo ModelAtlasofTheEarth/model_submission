@@ -78,7 +78,6 @@ jobs:
         #   github_token: ${{ steps.app-token.outputs.token }}
         #   labels: workflow_error
 
-
   requestReview:
     if: contains(github.event.label.name, 'review requested')
     runs-on: ubuntu-latest
@@ -182,7 +181,7 @@ jobs:
           SUBMITTER: ${{ github.event.issue.user.login }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           TEMPLATE: mate-model-template
-          FLAGS: --public
+          FLAGS: --public --include-all-branches
         run: |
           REPO_NAME=$(python3 .github/scripts/generate_identifier.py)
           gh repo create ${OWNER}/${REPO_NAME} --template ${OWNER}/$TEMPLATE $FLAGS
@@ -239,7 +238,7 @@ jobs:
               repo: context.repo.repo,
               labels: ['workflow_error']
             })
-      
+
       - name: add model created label
         uses: actions/github-script@v9
         with:
@@ -250,7 +249,7 @@ jobs:
               repo: context.repo.repo,
               labels: ['model created']
             })
-            
+
       # - name: add fail label
       #   if: failure()
       #   uses: actions-ecosystem/action-add-labels@v1.1.0
