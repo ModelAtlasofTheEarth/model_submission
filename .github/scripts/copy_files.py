@@ -7,6 +7,7 @@ def copy_files(repo,
                issue_dict,
                entry_list : list[str] = [],
                directory : str = '.website_material/',
+               branch : str = 'main',
                ):
     """
     Copies set GitHub Issue entries from the issue into the new repository.
@@ -21,6 +22,7 @@ def copy_files(repo,
         directory (str): The directory path within the repository where files should be placed (e.g. '.website_material/').
         issue_dict (dict): A dictionary containing metadata about the model, including optional image/animation records with 'url' and 'filename' keys. 
         entry_list (list): List of entry name from the issue to copy to the new repository at location 'directory'. (e.g. '["landing_image", "animation", "graphic_abstract", "model_setup_figure"]').
+        branch (str): The branch to write files to. Defaults to 'main'.
 
     Returns:
         None
@@ -40,7 +42,7 @@ def copy_files(repo,
                 # Skip if file already exists in repo's save_path
                 file_exists = False
                 try:
-                    _ = repo.get_contents(save_path)
+                    _ = repo.get_contents(save_path, ref=branch)
                     file_exists = True
                 except UnknownObjectException:
                     file_exists = False
@@ -54,6 +56,7 @@ def copy_files(repo,
                         new_path,
                         f"add {fname} to {new_path}",
                         response.content,
+                        branch=branch,
                     )
             else:
                 print(f"Skipping {entry} as the URL is empty")
