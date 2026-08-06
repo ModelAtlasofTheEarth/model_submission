@@ -22,6 +22,7 @@ token = os.environ.get("GITHUB_TOKEN")
 issue_number = int(os.environ.get("ISSUE_NUMBER"))
 model_owner = os.environ.get("OWNER")
 model_repo_name = os.environ.get("REPO")
+model_branch = os.environ.get("BRANCH") or "main"
 
 
 #get the time at which the function os ca
@@ -37,7 +38,7 @@ issue = repo.get_issue(number = issue_number)
 
 # Get model repo
 model_repo = g.get_repo(f"{model_owner}/{model_repo_name}")
-raw_base = f"https://raw.githubusercontent.com/{model_owner}/{model_repo_name}/main/"
+raw_base = f"https://raw.githubusercontent.com/{model_owner}/{model_repo_name}/{model_branch}/"
 
 # Parse issue
 data, error_log = parse_issue(issue)
@@ -59,7 +60,7 @@ nci_iso_record.to_csv(csv_buffer, index=False)
 # Reset buffer position to the beginning
 csv_buffer.seek(0)
 csv_content = csv_buffer.getvalue()
-model_repo.create_file(".metadata_trail/nci_iso.csv","add nci_iso record csv", csv_content)
+model_repo.create_file(".metadata_trail/nci_iso.csv","add nci_iso record csv", csv_content, branch=model_branch)
 
 #This is modifying rocratedict in place, which was not the intention
 try:
@@ -83,17 +84,17 @@ except:
 
 # Move files to repo
 rocratestr_flatcompact= json.dumps(flatcompact)
-model_repo.create_file("ro-crate-metadata.json","add ro-crate", rocratestr_flatcompact)
+model_repo.create_file("ro-crate-metadata.json","add ro-crate", rocratestr_flatcompact, branch=model_branch)
 #it would be good to remove this duplication and instead copy the main file across
-model_repo.create_file(".website_material/ro-crate-metadata.json","add ro-crate", rocratestr_flatcompact)
+model_repo.create_file(".website_material/ro-crate-metadata.json","add ro-crate", rocratestr_flatcompact, branch=model_branch)
 #we should do this this as part of the copy to website action
-model_repo.create_file(".metadata_trail/ro-crate-metadata-nested.json", "add nested ro-crate to .metadata_trail", rocratestr_nested)
+model_repo.create_file(".metadata_trail/ro-crate-metadata-nested.json", "add nested ro-crate to .metadata_trail", rocratestr_nested, branch=model_branch)
 
 #######
 #Save the trail of metadata sources to .metadata_trail
 issue_dict_str = json.dumps(data)
-model_repo.create_file(".metadata_trail/issue_body.md","add issue_body", issue.body)
-model_repo.create_file(".metadata_trail/issue_dict.json","add issue_dict", issue_dict_str)
+model_repo.create_file(".metadata_trail/issue_body.md","add issue_body", issue.body, branch=model_branch)
+model_repo.create_file(".metadata_trail/issue_dict.json","add issue_dict", issue_dict_str, branch=model_branch)
 
 #####Save license
 
@@ -102,8 +103,8 @@ try:
 except:
     license_url = ''
 license_txt = download_license_text(license_url)
-model_repo.create_file("LICENSE","add license text", license_txt)
-model_repo.create_file(".website_material/license.txt","add license text", license_txt)
+model_repo.create_file("LICENSE","add license text", license_txt, branch=model_branch)
+model_repo.create_file(".website_material/license.txt","add license text", license_txt, branch=model_branch)
 
 
 #####Create the README.md
@@ -113,13 +114,14 @@ report = dict_to_report(data, verbose = True)
 # Path to the README.md file
 file_path = 'README.md'
 # Retrieve the file to get its SHA and content
-file_contents = model_repo.get_contents(file_path)
+file_contents = model_repo.get_contents(file_path, ref=model_branch)
 # Update the README.md file
 update_info = model_repo.update_file(
     path=file_path,  # Path to the file in the repository
     message='Updated the README.md',  # Commit message
     content=pre_report + report,  # New content for the file
-    sha=file_contents.sha  # SHA of the file to update
+    sha=file_contents.sha,  # SHA of the file to update
+    branch=model_branch
 )
 
 #####Add to README.md in subdirectories:
@@ -133,7 +135,7 @@ except KeyError:
 file_path = 'model_code_inputs/README.md'
 
 # Retrieve the existing content of the README.md file
-file_contents = model_repo.get_contents(file_path)
+file_contents = model_repo.get_contents(file_path, ref=model_branch)
 existing_content = file_contents.decoded_content.decode()
 
 # Concatenate the existing content with the new notes
@@ -144,7 +146,8 @@ update_info = model_repo.update_file(
     path=file_path,
     message='Updated the README.md',
     content=updated_content,
-    sha=file_contents.sha
+    sha=file_contents.sha,
+    branch=model_branch
 )
 print("README.md updated successfully!")
 
@@ -159,7 +162,7 @@ except KeyError:
 file_path = 'model_output_data/README.md'
 
 # Retrieve the existing content of the README.md file
-file_contents = model_repo.get_contents(file_path)
+file_contents = model_repo.get_contents(file_path, ref=model_branch)
 existing_content = file_contents.decoded_content.decode()
 
 # Concatenate the existing content with the new notes
@@ -170,7 +173,8 @@ update_info = model_repo.update_file(
     path=file_path,
     message='Updated the README.md',
     content=updated_content,
-    sha=file_contents.sha
+    sha=file_contents.sha,
+    branch=model_branch
 )
 print("README.md updated successfully!")
 
@@ -205,14 +209,15 @@ model_repo.replace_topics(keywords)
 
 # Copy web material to repo
 commit_message = 'Add issue dict. in json to website'
-model_repo.create_file(".website_material/index.json", commit_message, issue_dict_str)
+model_repo.create_file(".website_material/index.json", commit_message, issue_dict_str, branch=model_branch)
 
 # copy the following issue entries to the new repository
 entry_list=["landing_image", "animation", "graphic_abstract", "model_setup_figure"]
 copy_files(repo = model_repo,
            entry_list = entry_list,
            issue_dict = data,
-           directory  = ".website_material/graphics/")
+           directory  = ".website_material/graphics/",
+           branch = model_branch)
 
 # Report creation of repository
 issue.create_comment(f"Model repository created at https://github.com/{model_owner}/{model_repo_name}")

@@ -78,7 +78,6 @@ jobs:
         #   github_token: ${{ steps.app-token.outputs.token }}
         #   labels: workflow_error
 
-
   requestReview:
     if: contains(github.event.label.name, 'review requested')
     runs-on: ubuntu-latest
@@ -182,11 +181,16 @@ jobs:
           SUBMITTER: ${{ github.event.issue.user.login }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           TEMPLATE: mate-model-template
-          FLAGS: --public
+          BRANCH: rocrate-usage
+          FLAGS: --public --include-all-branches
         run: |
           REPO_NAME=$(python3 .github/scripts/generate_identifier.py)
           gh repo create ${OWNER}/${REPO_NAME} --template ${OWNER}/$TEMPLATE $FLAGS
           echo "repo_name=${REPO_NAME}" >> $GITHUB_OUTPUT
+          echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
+          # Wait for GitHub to finish populating branches from the template
+          sleep 10
+          gh repo edit ${OWNER}/${REPO_NAME} --default-branch ${BRANCH}
           gh api --method=PUT "repos/${OWNER}/${REPO_NAME}/collaborators/${SUBMITTER}" -f permission=admin
           gh api --method=POST "repos/${OWNER}/${REPO_NAME}/labels" -f name='model published' -f description='Model published' -f color=B93BCB
 
@@ -197,6 +201,7 @@ jobs:
           OWNER: ${{ github.event.repository.owner.login }}
           REPO: ${{ steps.create-model-repo.outputs.repo_name }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          BRANCH: ${{ steps.create-model-repo.outputs.branch }}
         run: |
           python3 .github/scripts/write_repo_contents.py
 
@@ -239,7 +244,7 @@ jobs:
               repo: context.repo.repo,
               labels: ['workflow_error']
             })
-      
+
       - name: add model created label
         uses: actions/github-script@v9
         with:
@@ -250,7 +255,7 @@ jobs:
               repo: context.repo.repo,
               labels: ['model created']
             })
-            
+
       # - name: add fail label
       #   if: failure()
       #   uses: actions-ecosystem/action-add-labels@v1.1.0
