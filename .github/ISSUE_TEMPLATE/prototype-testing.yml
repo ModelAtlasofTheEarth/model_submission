@@ -212,21 +212,28 @@ body:
       placeholder: "e.g., https://doi.org/10.5281/zenodo.7455999"
       description: |
         Software framework would typcically refer to a generic modellign code (e.g. Underworld, Badlands, Citcom, FEniCS)
-        Providing a DOI here will usually allow several of the fields below to be filled. 
+        Providing a DOI here will usually allow several of the fields below to be filled. Can handle multiple.
 
   - type: input
     id: software_framework_repository
     attributes:
-      label: software framework source repository
+      label: Software framework source repository
       placeholder: "e.g., https://github.com/underworldcode/underworld2"
       description: "If the software has a public source code repository, please add it here"
 
   - type: input
+    id: software_version_id
+    attributes:
+      label: Software version used.
+      placeholder: "e.g., v2.17.1"
+      description: "Tag, Version or sha commit"
+
+  - type: input
     id: software_framework
     attributes:
-      label: name of primary software framework (e.g. Underworld, ASPECT, Badlands, OpenFOAM)
+      label: If name of primary software framework (e.g. Underworld, ASPECT, Badlands, OpenFOAM)
       placeholder: "e.g., Underworld2"
-      description: "If provided, the name from software framework DOI will be used"
+      description: "The software framework name, will be fetch from the DOI if left blank."
 
   - type: textarea
     id: software_framework_authors
@@ -256,14 +263,23 @@ body:
 
   - type: markdown
     attributes:
-      value: "In this section we will gather some information so we can display your model on mate.science. Not all items are required, but we need at least one image!"
+      value: "In this section we will gather information so we can display your model on https://mate.science."
 
   - type: textarea
-    id: web_landing_page
+    id: web_landing_page_image
     attributes:
-      label: add landing page image and caption
+      label: add landing page image
+      placeholder: "e.g., Drag and drop image png"
+      description: "Please provide a landing page image by dragging an image file into this box. Max file size is 2 Mb. PNG please. Please also provide a short caption."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: web_landing_page_caption
+    attributes:
+      label: add landing page caption
       placeholder: "e.g., Caption for landing page image"
-      description: "Please provide a landing page image by dragging an image file into this box. Max file size is 2 Mb. JPEG, PNG, SVG, PDF, PPTX, or ZIP are supported. Please also provide a short caption."
+      description: "Please provide a landing page caption."
     validations:
       required: true
 
@@ -303,6 +319,8 @@ body:
     attributes:
       value: |
         Thanks for submitting a new model to the M@TE collection. 
+        Once you hit submit the following will happen...
+        
         This information provided in this form will enable us to produce a metadata file for your model, and showcase the model on our website.
         The [README.md](https://github.com/ModelAtlasofTheEarth/model_submission/blob/main/README.md) file in this repository provides an overview of the remaining model subission steps.
         Once you click submit, Github actions will parse this form, collect existing metadata, and produce a summary report for your model. 
