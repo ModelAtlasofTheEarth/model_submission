@@ -1,7 +1,7 @@
 ---
 name: Prototype M@TE submission
 description: Submit a new model request
-title: "A new Issue template for model submission"
+title: "The GitHub Issue title for this M@TE submission"
 labels: ["new model"]
 
 body:
@@ -77,38 +77,32 @@ body:
   - type: input
     id: pub_doi
     attributes:
-      label: associated publication DOI
+      label: publication DOI
       placeholder: "e.g., https://doi.org/10.47366/sabia.v5n1a3."
-      description: "By providing an associated publication DOI, we can prefill many of the remaining fields for Section 1. If no associated publication is provided, the following fields should be provided"
-
-
-  - type: markdown
-    attributes:
-      value: |
-        Who is responsible for the model?
-        [CreativeWorks](https://schema.org/CreativeWork) differentiate been the primary [authors/creators](https://schema.org/author) and secondary [contributors](https://schema.org/contributor).
+      description: "The DOI will be used to automatically fill metadata information after the submission is made."
 
   - type: textarea
-    id: model_creators
+    id: c_authors
     attributes:
-      label: model creators
+      label: contributing authors
       placeholder: "e.g., ORCID iD (or Citizen, Jane)"
-      description: "Please provide ORCID iDs for the primary creators of the model (or FamilyName(s), GivenName(s)), one per line.
-      If no input provided, all authors from the publication DOI will be added."
+      description: "Please provide ORCID iDs for the the authors (or FamilyName(s), GivenName(s)), one per line.
+      If no input provided, all authors from the publication DOI will be added.
+      [CreativeWorks](https://schema.org/CreativeWork) differentiate been the primary [authors/creators](https://schema.org/author) and secondary [contributors](https://schema.org/contributor)."
 
   - type: input
     id: title
     attributes:
       label: title
       placeholder: "e.g., title of you model"
-      description: "If no input provided, info. from publication DOI will be used"
+      description: "Title of the model on the M@TE website, will be fetched from the publication DOI if left empty"
 
   - type: textarea
     id: description
     attributes:
       label: description
       placeholder: "This model was developed in order to...."
-      description: "A brief model description. Preferably plain language, and < 100 words."
+      description: "A brief plain language model description < 100 words."
     validations:
       required: true
       
