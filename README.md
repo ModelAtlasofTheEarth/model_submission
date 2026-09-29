@@ -1,16 +1,10 @@
 # Welcome to the Model Atlas of The Earth (M@TE) 
 
-![Static Badge](https://img.shields.io/badge/DOI-10.25914%2Fyrzp--g882-blue)
-
-
-## Model submission overview and objectives
-
-* M@TE models begin their life as github repositories, based on a [this repository template](https://github.com/ModelAtlasofTheEarth/mate_model_template)
-* New models are spawned using the [github issues functionality](https://github.com/ModelAtlasofTheEarth/model_submission/issues), within this repository
-* We provide workflows (using github actions) that aim to harvest and reuse as much existing metadata as possible, using persistent identifiers such as ORCiDs and RoRs
-* The result is a model repository that comes with a rich metadata document, based on the [RO-Crate](https://www.researchobject.org/ro-crate/) project
-* This process also assembles material so we can feature the model on the [M@TE website](https://mate.science)
-
+<p align="center">
+  <a href="https://github.com/ModelAtlasofTheEarth/model_submission/issues/new?template=new_model_request.yml">
+    <img src="https://img.shields.io/badge/Make%20Submission-%20%E2%96%B6%20-blue?style=for-the-badge&logo=github" alt="Make Submission" />
+  </a>
+</p>
 
 ## Model submission workflow:
 
