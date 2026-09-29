@@ -1,7 +1,7 @@
 ---
 name: Prototype M@TE submission
 description: Submit a new model request
-title: ""
+title: "A new Issue template for model submission"
 labels: ["new model"]
 
 body:
