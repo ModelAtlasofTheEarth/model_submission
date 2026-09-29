@@ -111,7 +111,7 @@ body:
     attributes:
       label: abstract
       placeholder: "Your scientific abstract"
-      description: "if no input provided, abstract from publication DOI will be used. Markdown formatting can be used here and will be rendered on the website."
+      description: "Please provide an abstract. Will be fetched from the publication DOI if left blank."
 
   - type: input
     id: keywords
@@ -136,11 +136,11 @@ body:
 
   - type: markdown
     attributes:
-      value: "## Section 2: your model code, output data"
+      value: "## Section 2: metadata for your model inputs, code and outputs"
 
   - type: markdown
     attributes:
-      value: "_Adding your model code and model output data takes place later, once your model repository has been set up!._"
+      value: "Adding the actual model code and model output data *takes place later*, once this submission has been approved."
 
   - type: input
     id: request_embargo
