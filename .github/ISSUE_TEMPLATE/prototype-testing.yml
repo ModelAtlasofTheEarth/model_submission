@@ -153,7 +153,7 @@ body:
         Model components (input code, output data) will only become downloadable on the M@TE NCI collection, once the embargo has ended.
 
   - type: checkboxes
-    id: code_include
+    id: input_included
     attributes:
       label: include model code ?
       options:
@@ -163,62 +163,47 @@ body:
       required: true
 
   - type: input
-    id: code_doi
+    id: input_doi
     attributes:
       label: model code/inputs DOI
       placeholder: "e.g., https://doi.org/10.47366/sabia.v5n1a3."
-      description: "Does your model code/input data have an existing DOI (or URL. e.g., github repo.)?"
+      description: "Please provide your model code/inputs. For example: existing DOI, github repository. Multiple can be handled."
 
   - type: textarea
-    id: code_notes
+    id: input_notes
     attributes:
       label: model code/inputs notes
       placeholder: "e.g., Model is setup with a Python script, model.py, with X parameter provided as an argument"
       description: "Please provide a basic description of your model code/input"
 
   - type: checkboxes
-    id: data_include
+    id: output_included
     attributes:
-      label: include model output data?
+      label: include model output?
       options:
         - label: "yes"
-      description: "Are you intending to submit your model output data as part of your M@TE model?"
+      description: "Are you intending to submit your model output as part of your M@TE submission?"
     validations:
       required: true
 
   - type: textarea
-    id: data_creators
+    id: output_notes
     attributes:
-      label: data creators
-      placeholder: "e.g., ORCID iD (or Citizen, Jane)"
-      description: "Please provide ORCID iDs for the person(s) who ran the computation to produce this dataset (or FamilyName(s), GivenName(s)), one per line.
-      This field is relavent if a model has been re-run by someone other than the model creator. If blank this field defaults to the list of creators."
-
-  - type: input
-    id: data_doi
-    attributes:
-      label: model output data DOI
-      placeholder: "e.g., https://doi.org/10.47366/sabia.x5n1a3."
-      description: "Does your model output data have an existing DOI (or URL. e.g., github repo.)?"
-
-  - type: textarea
-    id: data_notes
-    attributes:
-      label: model output data notes
+      label: model output notes
       placeholder: "e.g., output data primarily consists of ~ 1000 *.vtk files, each representing an output timestep, with a total size of 66 Gb."
       description: "Please provide a basic description of your output data"
 
   - type: input
-    id: data_size
+    id: output_size
     attributes:
-      label: model output data size
-      placeholder: "e.g., Model output data have a total size of ~ 128 Gb."
+      label: model output size
+      placeholder: "e.g., Model output have a total size of ~ 128 Gb."
       description: "Please provide an estimate of the total file size you wish to contribute."
+
 
   - type: markdown
     attributes:
       value: "## Section 3: software framework and compute details"
-
 
   - type: input
     id: software_framework_doi_uri
