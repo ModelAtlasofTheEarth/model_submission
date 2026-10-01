@@ -73,6 +73,21 @@ try:
     #add the @ back to type, id
     flatcompact = replace_keys_recursive(flatcompact)
 
+    def normalize_local_ids(obj):
+        base_uri = "http://example.org/base/"
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if key == "@id" and isinstance(value, str) and value.startswith(base_uri):
+                    local_id = value[len(base_uri):]
+                    obj[key] = "./" if local_id in ("", ".") else local_id
+                else:
+                    normalize_local_ids(value)
+        elif isinstance(obj, list):
+            for item in obj:
+                normalize_local_ids(item)
+
+    normalize_local_ids(flatcompact)
+
 except:
     #use the flattening routine we wrote
     #this is not necessary fully compacted (although we try to build compact records)
