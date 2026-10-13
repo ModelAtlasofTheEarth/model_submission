@@ -664,12 +664,12 @@ def defaults_and_customise_ro_crate(issue_dict, ro_crate, timestamp=False, githu
     ro_crate['@graph'][root_index]['url'] = [mate_science_url.format(slug), mate_gh_url.format(slug)]
     thredds_string = MATE_THREDDS_BASE.format(slug)
     roc_index = find_index_by_id(ro_crate, 'model_output_data')
-    ro_crate['@graph'][roc_index]['url'] = thredds_string
     # by hand add the model_output_data in the rocrate here
     if isinstance(roc_index, int):
-        notes = issue_dict.get("model_output_data", {}).get("notes","")
-        if notes:
-            ro_crate["@graph"][roc_index]["description"] = notes
+        ro_crate['@graph'][roc_index]['url'] = thredds_string
+        #notes = issue_dict.get("model_output_data", {}).get("notes","")
+        #if notes:
+        #    ro_crate["@graph"][roc_index]["description"] = notes
     roc_index = find_index_by_id(ro_crate, 'model_code_inputs')
     ro_crate['@graph'][roc_index]['url'] = thredds_string
 
