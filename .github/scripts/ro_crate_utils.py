@@ -9,6 +9,16 @@ from collections.abc import MutableMapping
 from fuzzywuzzy import fuzz, process
 
 
+def get_nested_value(d, key):
+    """Return a nested value using dot notation; preserve falsy values."""
+    current = d
+    for part in key.split('.'):
+        if not isinstance(current, dict) or part not in current:
+            return None
+        current = current[part]
+    return current
+
+
 def recursively_filter_key(obj, entity_template):
 
     """
@@ -240,52 +250,52 @@ def search_replace_sub_dict(crate, graph_index):
 
 
 
-def apply_entity_mapping(metadata, mapping, issue_dict, graph_index):
-    """
-    Updates a specific entity within the metadata's @graph array using values from an issue dictionary,
-    based on a provided mapping. This function iterates over the mapping dictionary, where each key-value
-    pair represents a target entity attribute and its corresponding attribute in the issue dictionary.
-    If the value in the mapping is a list, it collects corresponding values from the issue_dict and
-    updates the target entity's attribute with this list of values. If a mapping value is None, a list with None elements,
-    or a key does not exist in the issue dictionary, the corresponding attribute in the target entity is left unchanged.
-
-    Parameters:
-    - metadata (dict): The metadata structure containing an '@graph' key with a list of entities.
-    - mapping (dict): A dictionary where each key represents an attribute in the target entity within
-                      the metadata's '@graph' array, and each value corresponds to an attribute or a list of attributes
-                      in the issue_dict. A value of None or a non-existent key results in no update for that attribute.
-    - issue_dict (dict): A dictionary containing data that should be mapped to the target entity in the
-                         metadata's '@graph' array.
-    - graph_index (int): The index of the target entity within the metadata's '@graph' array to which the
-                         mapping should be applied.
-
-    Returns:
-    None: The function updates the metadata in place and does not return a value.
-    """
-
-    # Validate metadata structure and graph_index
-    if '@graph' not in metadata or not isinstance(metadata['@graph'], list):
-        print("Warning: The provided metadata must contain an '@graph' key with a list of entities.")
-        return
-    if graph_index >= len(metadata['@graph']):
-        print(f"Warning: graph_index {graph_index} is out of range for the metadata's '@graph' array.")
-        return
-
-    # Iterate over the mapping and apply updates where possible
-    for target_key, issue_keys in mapping.items():
-        if issue_keys is None:
-            # Skip mapping if issue_keys is None
-            continue
-
-        if isinstance(issue_keys, list):
-            # Handle list of keys - collect corresponding values from issue_dict
-            values = [issue_dict[key] for key in issue_keys if key in issue_dict]
-            if values:
-                metadata['@graph'][graph_index][target_key] = values
-        else:
-            # Single key handling as before
-            if issue_keys in issue_dict:
-                metadata['@graph'][graph_index][target_key] = issue_dict[issue_keys]
+# def apply_entity_mapping(metadata, mapping, issue_dict, graph_index):
+#     """
+#     Updates a specific entity within the metadata's @graph array using values from an issue dictionary,
+#     based on a provided mapping. This function iterates over the mapping dictionary, where each key-value
+#     pair represents a target entity attribute and its corresponding attribute in the issue dictionary.
+#     If the value in the mapping is a list, it collects corresponding values from the issue_dict and
+#     updates the target entity's attribute with this list of values. If a mapping value is None, a list with None elements,
+#     or a key does not exist in the issue dictionary, the corresponding attribute in the target entity is left unchanged.
+# 
+#     Parameters:
+#     - metadata (dict): The metadata structure containing an '@graph' key with a list of entities.
+#     - mapping (dict): A dictionary where each key represents an attribute in the target entity within
+#                       the metadata's '@graph' array, and each value corresponds to an attribute or a list of attributes
+#                       in the issue_dict. A value of None or a non-existent key results in no update for that attribute.
+#     - issue_dict (dict): A dictionary containing data that should be mapped to the target entity in the
+#                          metadata's '@graph' array.
+#     - graph_index (int): The index of the target entity within the metadata's '@graph' array to which the
+#                          mapping should be applied.
+# 
+#     Returns:
+#     None: The function updates the metadata in place and does not return a value.
+#     """
+# 
+#     # Validate metadata structure and graph_index
+#     if '@graph' not in metadata or not isinstance(metadata['@graph'], list):
+#         print("Warning: The provided metadata must contain an '@graph' key with a list of entities.")
+#         return
+#     if graph_index >= len(metadata['@graph']):
+#         print(f"Warning: graph_index {graph_index} is out of range for the metadata's '@graph' array.")
+#         return
+# 
+#     # Iterate over the mapping and apply updates where possible
+#     for target_key, issue_keys in mapping.items():
+#         if issue_keys is None:
+#             # Skip mapping if issue_keys is None
+#             continue
+# 
+#         if isinstance(issue_keys, list):
+#             # Handle list of keys - collect corresponding values from issue_dict
+#             values = [issue_dict[key] for key in issue_keys if key in issue_dict]
+#             if values:
+#                 metadata['@graph'][graph_index][target_key] = values
+#         else:
+#             # Single key handling as before
+#             if issue_keys in issue_dict:
+#                 metadata['@graph'][graph_index][target_key] = issue_dict[issue_keys]
 
 
 def apply_entity_mapping_extended(metadata, mapping, issue_dict, graph_index):
@@ -307,13 +317,6 @@ def apply_entity_mapping_extended(metadata, mapping, issue_dict, graph_index):
     None: The function updates the metadata in place and does not return a value.
     """
 
-    def get_nested_value(d, key):
-        """Accesses a nested value in a dictionary using a dot-separated key."""
-        keys = key.split('.')
-        for k in keys:
-            d = d.get(k, {})
-        return d if d else None
-
     # Validate metadata structure and graph_index
     if '@graph' not in metadata or not isinstance(metadata['@graph'], list):
         print("Warning: The provided metadata must contain an '@graph' key with a list of entities.")
@@ -324,13 +327,19 @@ def apply_entity_mapping_extended(metadata, mapping, issue_dict, graph_index):
 
     # Iterate over the mapping and apply updates where possible
     for target_key, issue_keys in mapping.items():
+        if target_key == '@id':
+            continue
         if issue_keys is None:
             # Skip mapping if issue_keys is None
             continue
 
         if isinstance(issue_keys, list):
             # Handle list of keys - collect corresponding values from issue_dict, supporting nested keys
-            values = [get_nested_value(issue_dict, key) for key in issue_keys if get_nested_value(issue_dict, key) is not None]
+            values = []
+            for key in issue_keys:
+                value = get_nested_value(issue_dict, key)
+                if value is not None:
+                    values.append(value)
             if values:
                 metadata['@graph'][graph_index][target_key] = values
         else:
@@ -664,12 +673,8 @@ def defaults_and_customise_ro_crate(issue_dict, ro_crate, timestamp=False, githu
     ro_crate['@graph'][root_index]['url'] = [mate_science_url.format(slug), mate_gh_url.format(slug)]
     thredds_string = MATE_THREDDS_BASE.format(slug)
     roc_index = find_index_by_id(ro_crate, 'model_output_data')
-    # by hand add the model_output_data in the rocrate here
     if isinstance(roc_index, int):
         ro_crate['@graph'][roc_index]['url'] = thredds_string
-        #notes = issue_dict.get("model_output_data", {}).get("notes","")
-        #if notes:
-        #    ro_crate["@graph"][roc_index]["description"] = notes
     roc_index = find_index_by_id(ro_crate, 'model_code_inputs')
     ro_crate['@graph'][roc_index]['url'] = thredds_string
 
