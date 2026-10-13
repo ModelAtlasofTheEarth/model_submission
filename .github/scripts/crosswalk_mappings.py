@@ -45,8 +45,8 @@ model_inputs_node_mapping = {"@id":None,
             "storageRequirements":None}
 
 
-model_outputs_node_mapping = {"@id":None,
-            #the list around certain items in the mapping cause the same structure to appear in teh RO-Crate
+model_outputs_node_mapping = {"@id":"model_output_data/",
+            #the list around certain items in the mapping cause the same structure to appear in the RO-Crate
             "identifier": ["model_output_data.doi"],
             "@type":None,
             "description":"model_output_data.notes",
