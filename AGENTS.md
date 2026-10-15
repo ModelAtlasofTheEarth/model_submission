@@ -13,7 +13,7 @@ This file captures repo-specific workflow and commands so that agents operate ef
 - `.github/scripts/` contains the parsing, crosswalk and RO-Crate writers:
   - `crosswalks.py` & `ro_crate_utils.py` implement metadata mapping
   - `write_repo_contents.py` orchestrates final RO-Crate output
-- `.github/debug/submission_workflow.ipynb` is an executable notebook mirroring the CI parse/rebuild steps for rapid local debugging
+- `.github/debug/submission_workflow.ipynb` mirrors the CI parse/rebuild steps and is for local debugging only
 
 ## Workflow overview (GitHub Issues + Labels)
 1. **New model request**: open a GitHub Issue via the "New model request" template → `new model` label triggers parsing
@@ -37,9 +37,9 @@ This file captures repo-specific workflow and commands so that agents operate ef
 - `.github/scripts/` – core metadata pipeline modules
 - `.github/debug/` – interactive notebook for issue parsing
 - `requirements.txt` – Python dependencies for the pipeline
-- `README.md` – project overview and Issue-based workflow
+- `README.md` – project overview and issue-based workflow
 
 ## Quirks & gotchas
-- Metadata parsing is driven by GitHub Issue markdown; developers can debug this use the notebook `./github/debug/`
+- Metadata parsing is driven by GitHub Issue markdown; developers can debug this with `.github/debug/submission_workflow.ipynb`
 - The RO-Crate file must be named exactly `ro-crate-metadata.json` at repository root
 - Any changes to the Issue template or workflow filenames require updates in both `.github/workflows/` and the debug notebook
