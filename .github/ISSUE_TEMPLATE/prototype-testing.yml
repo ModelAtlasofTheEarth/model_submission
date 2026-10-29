@@ -88,7 +88,7 @@ body:
 
   - type: markdown
     attributes:
-      value: "##### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please complete this fields manually now. "
+      value: "<br/> <br/> ### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please complete this fields manually now. "
 
   - type: input
     id: pub_doi
