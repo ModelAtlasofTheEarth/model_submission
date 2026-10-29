@@ -169,7 +169,7 @@ body:
   - type: checkboxes
     id: input_included
     attributes:
-      label: include model code ?
+      label: include model inputs?
       options:
         - label: "yes"
       description: "Are you submitting your model's input files, including initial and boundary conditions and all other files required to run the model?"
@@ -180,9 +180,9 @@ body:
     id: input_notes
     attributes:
       render: text
-      label: model code/inputs notes
+      label: model reproducibility instructions
       placeholder: "e.g., Model is setup with a Python script, model.py, with X parameter provided as an argument"
-      description: "Please provide a basic description of your model code/input"
+      description: "Briefly describe how to set up and use your input files to reproduce the model, including any required configurations or parameters."
 
   - type: checkboxes
     id: output_included
@@ -190,7 +190,7 @@ body:
       label: include model output?
       options:
         - label: "yes"
-      description: "Are you intending to submit your model output as part of your M@TE submission?"
+      description: "Are you submitting your model's output files."
     validations:
       required: true
 
@@ -200,14 +200,14 @@ body:
       label: model output notes
       render: text
       placeholder: "e.g., output data primarily consists of ~ 1000 *.vtk files, each representing an output timestep, with a total size of 66 Gb."
-      description: "Please provide a basic description of your output data"
+      description: "Provide a basic description of your output data"
 
   - type: input
     id: output_size
     attributes:
       label: model output size
       placeholder: "e.g., Model output have a total size of ~ 128 Gb."
-      description: "Please provide an estimate of the total file size you wish to contribute."
+      description: "Provide an estimate of the total file size you wish to contribute."
 
   - type: input
     id: request_embargo
