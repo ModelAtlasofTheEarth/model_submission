@@ -125,14 +125,14 @@ body:
       label: abstract
       render: text
       placeholder: "Your scientific abstract"
-      description: "Please provide an abstract. Will be fetched from the publication DOI if left blank."
+      description: ""
 
   - type: input
     id: keywords
     attributes:
       label: scientific keywords
       placeholder: "e.g., keyword1, keyword2, ..."
-      description: "if no input provided, info. from publication DOI will be used"
+      description: ""
 
   - type: textarea
     id: funder_ROR_URI
@@ -180,7 +180,7 @@ body:
     id: input_notes
     attributes:
       render: text
-      label: model reproducibility instructions
+      label: model input usage, a.k.a reproducibility
       placeholder: "e.g., Model is setup with a Python script, model.py, with X parameter provided as an argument"
       description: "Briefly describe how to set up and use your input files to reproduce the model, including any required configurations or parameters."
 
@@ -221,21 +221,24 @@ body:
 
   - type: markdown
     attributes:
-      value: "## Section 3: software framework and compute details"
+      value: | 
+        ## Section 3: software and compute details
+
+        ### All fields below, in this section, will be automatically populated using the software DOI _after_ the form is submitted. If no software DOI is available, please skip the following software DOI field and complete all of the subsequent fields manually.
 
   - type: input
     id: software_framework_doi_uri
     attributes:
-      label: software framework DOI/URI
+      label: software DOI/URI
       placeholder: "e.g., https://doi.org/10.5281/zenodo.7455999"
       description: |
-        Software framework would typcically refer to a generic modellign code (e.g. Underworld, Badlands, Citcom, FEniCS)
-        Providing a DOI here will usually allow several of the fields below to be filled. Can handle multiple.
+        Software used (e.g. Underworld, Badlands, Citcom, FEniCS)
+        Providing a DOI here will automatically populate the fields below. You can give multiple DOI by entering one per line.
 
   - type: input
     id: software_framework_repository
     attributes:
-      label: Software framework source repository
+      label: Software source repository
       placeholder: "e.g., https://github.com/underworldcode/underworld2"
       description: "If the software has a public source code repository, please add it here"
 
