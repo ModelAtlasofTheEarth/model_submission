@@ -88,7 +88,11 @@ body:
 
   - type: markdown
     attributes:
-      value: "<br/> --- "
+      value: "<br/>"
+
+  - type: markdown
+    attributes:
+      value: "---"
 
   - type: markdown
     attributes:
