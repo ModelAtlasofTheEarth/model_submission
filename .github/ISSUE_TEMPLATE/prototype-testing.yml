@@ -89,8 +89,11 @@ body:
 
   - type: markdown
     attributes:
+      value: "<br/>"
+
+  - type: markdown
+    attributes:
       value: |
-          <br/>
           ---
           ### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please skip the following publication DOI field and complete all of the subsequent fields manually.
         
