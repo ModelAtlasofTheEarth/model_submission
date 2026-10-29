@@ -125,14 +125,14 @@ body:
       label: abstract
       render: text
       placeholder: "Your scientific abstract"
-      description: " "
+      description: "Abstract"
 
   - type: input
     id: keywords
     attributes:
       label: scientific keywords
       placeholder: "e.g., keyword1, keyword2, ..."
-      description: " "
+      description: "Keywords"
 
   - type: textarea
     id: funder_ROR_URI
