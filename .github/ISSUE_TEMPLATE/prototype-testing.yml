@@ -1,21 +1,21 @@
 ---
-name: Prototype M@TE submission
-description: Submit a new model request
-title: "The GitHub Issue title for this M@TE submission"
+name: M@TE submission form
+description: Welcome to the M@TE submission form - more info to come....
+title: "Provide a title here"
 labels: ["new model"]
 
 body:
 
   - type: markdown
     attributes:
-      value: "## Section 1: Summary of your model"
+      value: "## Section 1: Information about your model"
 
   - type: input
     id: submitter
     attributes:
       label: submitter ORCID (or name)
       placeholder: "e.g., 0000-0002-1270-4377 (or, Carey, Sam)"
-      description: "Please provide the ORCiD (or Familyname, GivenName) associated with the person submitting the model. This is not necessarily the model creator."
+      description: "Please provide the ORCiD (or family name, given name) associated with the person submitting the model. This is not necessarily the model creator."
     validations:
       required: true
 
@@ -47,12 +47,14 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: alt_licence_url
+  - type: textarea
+    id: description
     attributes:
-      label: alternative license URL
-      description: "If an alternative (open) license is required, please provide a URL."
-
+      label: description
+      placeholder: "This model was developed in order to...."
+      description: "A brief plain language model description < 100 words."
+    validations:
+      required: true
 
   - type: dropdown
     id: about_metadata_tags
@@ -63,6 +65,8 @@ body:
       options:
         - "forward model"
         - "inverse model"
+    validations:
+      required: true
 
   - type: dropdown
     id: status_metadata_tags
@@ -73,6 +77,14 @@ body:
       options:
         - "completed"
         - "ongoing"
+    validations:
+      required: true
+
+  - type: input
+    id: alt_licence_url
+    attributes:
+      label: alternative license URL
+      description: "If an alternative (open) license is required, please provide a URL."
 
   - type: input
     id: pub_doi
@@ -86,9 +98,7 @@ body:
     attributes:
       label: contributing authors
       placeholder: "e.g., ORCID iD (or Citizen, Jane)"
-      description: "Please provide ORCID iDs for the the authors (or FamilyName(s), GivenName(s)), one per line.
-      If no input provided, all authors from the publication DOI will be added.
-      [CreativeWorks](https://schema.org/CreativeWork) differentiate been the primary [authors/creators](https://schema.org/author) and secondary [contributors](https://schema.org/contributor)."
+      description: "All authors from the publication DOI will be added after the submission is made. If no DOI is provided then fill the ORCIDs of the authors, one per line."
 
   - type: input
     id: title
@@ -96,15 +106,6 @@ body:
       label: title
       placeholder: "e.g., title of you model"
       description: "Title of the model on the M@TE website, will be fetched from the publication DOI if left empty"
-
-  - type: textarea
-    id: description
-    attributes:
-      label: description
-      placeholder: "This model was developed in order to...."
-      description: "A brief plain language model description < 100 words."
-    validations:
-      required: true
       
   - type: textarea
     id: abstract
