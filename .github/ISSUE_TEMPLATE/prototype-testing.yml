@@ -89,16 +89,11 @@ body:
 
   - type: markdown
     attributes:
-      value: "<br/>"
-
-  - type: markdown
-    attributes:
-      value: "---"
-
-  - type: markdown
-    attributes:
-      value: "### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please skip the following publication DOI field and complete all of the subsequent fields manually."
-
+      value: |
+          <br/>
+          ---
+          ### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please skip the following publication DOI field and complete all of the subsequent fields manually.
+        
   - type: input
     id: pub_doi
     attributes:
@@ -190,6 +185,7 @@ body:
   - type: textarea
     id: input_notes
     attributes:
+      render: text
       label: model code/inputs notes
       placeholder: "e.g., Model is setup with a Python script, model.py, with X parameter provided as an argument"
       description: "Please provide a basic description of your model code/input"
@@ -208,6 +204,7 @@ body:
     id: output_notes
     attributes:
       label: model output notes
+      render: text
       placeholder: "e.g., output data primarily consists of ~ 1000 *.vtk files, each representing an output timestep, with a total size of 66 Gb."
       description: "Please provide a basic description of your output data"
 
@@ -256,6 +253,7 @@ body:
   - type: textarea
     id: software_framework_authors
     attributes:
+      render: text
       label: software framework authors
       placeholder: "e.g., ORCID iD (or Citizen, Jane)"
       description: "Please provide ORCID iDs for software framework authors (or FamilyName(s), GivenName(s)), one per line. If no input provided, authors from software framework DOI will be used"
@@ -286,6 +284,7 @@ body:
   - type: textarea
     id: web_landing_page_image
     attributes:
+      render: text
       label: add landing page image
       placeholder: "e.g., Drag and drop image png"
       description: "Please provide a landing page image by dragging an image file into this box. Max file size is 2 Mb. PNG please. Please also provide a short caption."
@@ -295,6 +294,7 @@ body:
   - type: textarea
     id: web_landing_page_caption
     attributes:
+      render: text
       label: add landing page caption
       placeholder: "e.g., Caption for landing page image"
       description: "Please provide a landing page caption."
@@ -326,6 +326,7 @@ body:
     id: model_setup_description
     attributes:
       label: add a description of your model setup
+      render: text
       placeholder: "e.g., The model uses a cartesian domain, with size 200 km x 200 km x 300 km."
       description: "Please provide add a brief (< 300 words) description of your model setup, boundary condition, assumptions. Markdown formatting can be used here and will be rendered on the website."
 
@@ -346,7 +347,6 @@ body:
 
   - type: textarea
     attributes:
+      render: text
       label: Please provide any feedback on the model submission process?
       placeholder: "Did you find any terminology confusing? Did you have issues with adding files? Is there important information about your model that that we didn't collect?"
-        
-
