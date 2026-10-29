@@ -226,10 +226,11 @@ body:
 
         ### All fields below, in this section, will be automatically populated using the software DOI _after_ the form is submitted. If no software DOI is available, please skip the following software DOI field and complete all of the subsequent fields manually.
 
-  - type: input
+  - type: textarea
     id: software_framework_doi_uri
     attributes:
       label: software DOI/URI
+      render: text
       placeholder: "e.g., https://doi.org/10.5281/zenodo.7455999"
       description: |
         Software used (e.g. Underworld, Badlands, Citcom, FEniCS)
