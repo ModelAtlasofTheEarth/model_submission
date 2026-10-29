@@ -95,7 +95,7 @@ body:
     attributes:
       value: |
           ---
-          ### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please skip the following publication DOI field and complete all of the subsequent fields manually.
+          ### All fields below, in this section, will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please skip the following publication DOI field and complete all of the subsequent fields manually.
         
   - type: input
     id: pub_doi
@@ -157,33 +157,24 @@ body:
   - type: markdown
     attributes:
       value: "This section captures information about your model's inputs, code, and outputs. The upload of the actual model code, input files, and outputs takes place at a later stage, once your submission has been approved."
-
-  - type: input
-    id: request_embargo
+  
+  - type: textarea
+    id: model_links
     attributes:
-      label: model embargo?
-      placeholder: "Leave blank if No, if YES, provide a date in the form e.g., 1964-02-29"
-      description: |
-        If you would like to request an embargo period, please provide an estimated end date in the form [1964-02-29] (i.e '%Y-%m-%d').
-        Model submission can proceeed as normal, and you will recieve a DOI once submission is complete.
-        Model components (input code, output data) will only become downloadable on the M@TE NCI collection, once the embargo has ended.
-
+      render: text
+      label: model links
+      placeholder: "e.g., https://doi.org/10.47366/sabia.v5n1a3."
+      description: "Provide any existing links where your model's inputs and/or outputs are stored (e.g., GitHub, Zenodo). Multiple links or DOIs can be included."
+  
   - type: checkboxes
     id: input_included
     attributes:
       label: include model code ?
       options:
         - label: "yes"
-      description: "Are you intending to submit code (scripts, input data, post-processing) as part of your M@TE model?"
+      description: "Are you submitting your model's input files, including initial and boundary conditions and all other files required to run the model?"
     validations:
       required: true
-
-  - type: input
-    id: input_doi
-    attributes:
-      label: model code/inputs DOI
-      placeholder: "e.g., https://doi.org/10.47366/sabia.v5n1a3."
-      description: "Please provide your model code/inputs. For example: existing DOI, github repository. Multiple can be handled."
 
   - type: textarea
     id: input_notes
@@ -218,6 +209,15 @@ body:
       placeholder: "e.g., Model output have a total size of ~ 128 Gb."
       description: "Please provide an estimate of the total file size you wish to contribute."
 
+  - type: input
+    id: request_embargo
+    attributes:
+      label: model embargo?
+      placeholder: "Leave blank if No, if YES, provide a date in the form e.g., 1964-02-29"
+      description: |
+        If you would like to request an embargo period, please provide an estimated end date in the form [1964-02-29] (i.e '%Y-%m-%d').
+        Model submission can proceeed as normal, and you will recieve a DOI once submission is complete.
+        Model components (input code, output data) will only become downloadable on the M@TE NCI collection, once the embargo has ended.
 
   - type: markdown
     attributes:
