@@ -46,7 +46,13 @@ body:
         - alternative
     validations:
       required: true
-
+  
+  - type: input
+    id: alt_licence_url
+    attributes:
+      label: alternative license URL
+      description: "If an alternative (open) license is required, please provide a URL."
+  
   - type: textarea
     id: description
     attributes:
@@ -80,11 +86,9 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: alt_licence_url
+  - type: markdown
     attributes:
-      label: alternative license URL
-      description: "If an alternative (open) license is required, please provide a URL."
+      value: "##### All fields below will be automatically populated using the publication DOI _after_ the form is submitted. If no publication DOI is available, please complete this fields manually now. "
 
   - type: input
     id: pub_doi
