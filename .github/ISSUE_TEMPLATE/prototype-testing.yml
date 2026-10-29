@@ -282,11 +282,11 @@ body:
 
   - type: markdown
     attributes:
-      value: "## Section 4: sisual and text materials for mate.science"
+      value: "## Section 4: Visual and text materials for https://mate.science"
 
   - type: markdown
     attributes:
-      value: "This section collects the visual and text materials used to present your model on the M@TE website, https://mate.science."
+      value: "This section collects the visual and text materials used to present your model on the M@TE website."
 
   - type: textarea
     id: web_landing_page_image
@@ -302,7 +302,7 @@ body:
   - type: textarea
     id: web_animation
     attributes:
-      label: add an animation (if relevant)
+      label: add an animation
       placeholder: "e.g., Caption for model animation"
       description: |
         Provide an animation by dragging a file into this box. Only GIF and MP4 are supported. Max file size is 20 Mb.
@@ -311,7 +311,7 @@ body:
   - type: textarea
     id: graphic_abstract
     attributes:
-      label: add a graphic abstract figure (if relevant)
+      label: add a graphic abstract figure
       placeholder: "e.g., Caption for graphic abstract"
       description: | 
         Provide a graphic abstract, or a figure that summariese key finding. Max file size is 2 Mb. PNG format only.
@@ -320,7 +320,7 @@ body:
   - type: textarea
     id: model_setup
     attributes:
-      label: add a model setup figure (if relevant)
+      label: add a model setup figure
       placeholder: "e.g., Caption for model setup figure"
       description: | 
         Provide a model setup image by dragging an image file into this box. Max file size is 2 Mb. 
@@ -341,16 +341,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for submitting a new model to the M@TE collection. 
-        Once you hit submit the following will happen...
-        
-        This information provided in this form will enable us to produce a metadata file for your model, and showcase the model on our website.
-        The [README.md](https://github.com/ModelAtlasofTheEarth/model_submission/blob/main/README.md) file in this repository provides an overview of the remaining model subission steps.
-        Once you click submit, Github actions will parse this form, collect existing metadata, and produce a summary report for your model. 
-        You can maintain a conversation with the M@TE team via the issue thread. 
+        To submit the model, Click the **Create** button below. 
+        This will alert the M@TE team to your submission and get the process started to include your model in the M@TE collection. 
+        Once you hit **Create** the M@TE team will review your model and contact you via GitHub.
+        All steps in the M@TE process are explained at https://github.com/ModelAtlasofTheEarth/model_submission/blob/main/README.md
 
   - type: textarea
     attributes:
       render: text
-      label: Please provide any feedback on the model submission process?
-      placeholder: "Did you find any terminology confusing? Did you have issues with adding files? Is there important information about your model that that we didn't collect?"
+      label: Provide any feedback on the model submission process?
+      placeholder: "Any feedback?"
