@@ -57,6 +57,7 @@ body:
     id: description
     attributes:
       label: description
+      render: text
       placeholder: "This model was developed in order to...."
       description: "A brief plain language model description < 100 words."
     validations:
@@ -109,6 +110,7 @@ body:
     id: c_authors
     attributes:
       label: contributing authors
+      render: text
       placeholder: "e.g., ORCID iD (or Citizen, Jane)"
       description: "All authors from the publication DOI will be added after the submission is made. If no DOI is provided then fill the ORCIDs of the authors, one per line."
 
@@ -137,6 +139,7 @@ body:
     id: funder_ROR_URI
     attributes:
       label: funder
+      render: text
       placeholder: |
         https://www.arc.gov.au/, myGrant#id
         Another funding body
