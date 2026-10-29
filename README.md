@@ -6,6 +6,12 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/ModelAtlasofTheEarth/model_submission/issues/new?template=mission_possibile.yml">
+    <img src="https://img.shields.io/badge/Make%20Submission-%20%E2%96%B6%20-blue?style=for-the-badge&logo=github" alt="Make Submission" />
+  </a>
+</p>
+
 ## Model submission workflow:
 
 **1) Make a new model request:**
