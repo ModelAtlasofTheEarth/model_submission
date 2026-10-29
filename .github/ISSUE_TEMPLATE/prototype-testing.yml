@@ -253,17 +253,17 @@ body:
   - type: input
     id: software_framework
     attributes:
-      label: If name of primary software framework (e.g. Underworld, ASPECT, Badlands, OpenFOAM)
+      label: Provide the name of the software (e.g. Underworld, ASPECT, Badlands, OpenFOAM)
       placeholder: "e.g., Underworld2"
-      description: "The software framework name, will be fetch from the DOI if left blank."
+      description: "The software name will be fetch from the DOI if left blank."
 
   - type: textarea
     id: software_framework_authors
     attributes:
       render: text
-      label: software framework authors
+      label: software authors
       placeholder: "e.g., ORCID iD (or Citizen, Jane)"
-      description: "Please provide ORCID iDs for software framework authors (or FamilyName(s), GivenName(s)), one per line. If no input provided, authors from software framework DOI will be used"
+      description: "Provide ORCID iDs for software authors (or FamilyName(s), GivenName(s)), one per line. If no input provided, authors from software DOI will be used"
 
   - type: input
     id: software_keywords
@@ -277,7 +277,7 @@ body:
     attributes:
       label: computer URI/DOI
       placeholder: "e.g., https://doi.org/10.47366/sabia.v5n1a3."
-      description: "Please provide a DOI/URI for the computation resource (if relavent)"
+      description: "Provide a DOI/URI for the computation resource (if relavent)"
 
 
   - type: markdown
